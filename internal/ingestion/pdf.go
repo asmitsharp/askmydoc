@@ -71,7 +71,7 @@ func loadEmbeddedPDFText(path string) (*Document, error) {
 		})
 	}
 
-	return newDocumentFromPages(pages), nil
+	return newDocumentFromPages(path, pages), nil
 }
 
 func extractPageText(page pdf.Page) (string, error) {
@@ -130,7 +130,7 @@ func loadOCRPDFText(path string) (*Document, error) {
 		return nil, fmt.Errorf("ocr produced no extractable text")
 	}
 
-	return newDocumentFromPages(pages), nil
+	return newDocumentFromPages(path, pages), nil
 }
 
 func runTesseractOCR(tesseractPath string, png []byte) (string, error) {
@@ -210,7 +210,7 @@ func normalizeOCRText(text string) string {
 	return strings.Join(normalized, "\n")
 }
 
-func newDocumentFromPages(pages []Page) *Document {
+func newDocumentFromPages(source string, pages []Page) *Document {
 	var content bytes.Buffer
 	for _, page := range pages {
 		if content.Len() > 0 {
@@ -221,6 +221,7 @@ func newDocumentFromPages(pages []Page) *Document {
 
 	return &Document{
 		Content: content.String(),
+		Source:  source,
 		Pages:   pages,
 	}
 }

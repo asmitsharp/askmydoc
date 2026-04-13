@@ -8,6 +8,7 @@ import (
 
 type Document struct {
 	Content string
+	Source  string
 	Pages   []Page
 }
 

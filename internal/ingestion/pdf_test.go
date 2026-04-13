@@ -13,7 +13,7 @@ func TestNormalizeOCRText(t *testing.T) {
 }
 
 func TestNewDocumentFromPages(t *testing.T) {
-	doc := newDocumentFromPages([]Page{
+	doc := newDocumentFromPages("sample.pdf", []Page{
 		{Number: 1, Content: "alpha"},
 		{Number: 2, Content: "beta"},
 	})

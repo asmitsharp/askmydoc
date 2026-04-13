@@ -12,7 +12,10 @@ func (t *TextLoader) Load(path string) (*Document, error) {
 	if err != nil {
 		return nil, fmt.Errorf("text loader : %w", err)
 	}
-	return &Document{Content: string(data)}, nil
+	return &Document{
+		Content: string(data),
+		Source:  path,
+	}, nil
 }
 
 func (t *TextLoader) Supports(ext string) bool {

@@ -15,6 +15,7 @@ func (m MarkdownLoader) Load(path string) (*Document, error) {
 
 	document := &Document{
 		Content: string(content),
+		Source:  path,
 	}
 
 	return document, nil
