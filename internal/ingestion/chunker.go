@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/google/uuid"
 )
 
 type Chunk struct {
@@ -69,7 +71,7 @@ func (c *Chunker) Chunk(doc *Document) []Chunk {
 		return nil
 	}
 
-	if estimateTokens(doc.Content) <= c.MaxChunkTokens {
+	if EstimateTokens(doc.Content) <= c.MaxChunkTokens {
 		return []Chunk{
 			{
 				ID:      chunkID(doc.Source, 0),
@@ -114,7 +116,7 @@ func (c *Chunker) ChunkPages(doc *Document) []Chunk {
 }
 
 func (c *Chunker) splitText(text string, separators []string) []string {
-	if estimateTokens(text) <= c.MaxChunkTokens {
+	if EstimateTokens(text) <= c.MaxChunkTokens {
 		return []string{text}
 	}
 	if len(separators) == 0 {
@@ -133,7 +135,7 @@ func (c *Chunker) splitText(text string, separators []string) []string {
 			continue
 		}
 
-		if estimateTokens(part) <= c.MaxChunkTokens {
+		if EstimateTokens(part) <= c.MaxChunkTokens {
 			result = append(result, part)
 		} else {
 			result = append(result, c.splitText(part, separators[1:])...)
@@ -185,7 +187,7 @@ func (c *Chunker) mergeSplits(splits []string, source string) []Chunk {
 			candidate = current + "\n\n" + split
 		}
 
-		if estimateTokens(candidate) <= c.MaxChunkTokens {
+		if EstimateTokens(candidate) <= c.MaxChunkTokens {
 			current = candidate
 		} else {
 			flush()
@@ -225,6 +227,25 @@ func estimateTokens(text string) int {
 	return (count + 3) / 4
 }
 
+func EstimateTokens(text string) int {
+	return estimateTokens(text)
+}
+
+// docNamespace is a UUID namespace for document chunks.
+// This ensures consistent UUIDs across runs for the same source+index.
+var docNamespace = uuid.Must(uuid.Parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8"))
+
+// chunkID generates a deterministic UUID v5 for a chunk.
+// The same source and index will always produce the same UUID,
+// making re-indexing idempotent and compatible with Qdrant.
 func chunkID(source string, index int) string {
-	return fmt.Sprintf("%s-%d", source, index)
+	// Create a namespace for this source to avoid collisions
+	// across different sources
+	sourceNamespace := uuid.NewSHA1(docNamespace, []byte(source))
+
+	// Create the final UUID from source namespace + index
+	chunkName := fmt.Sprintf("%d", index)
+	finalUUID := uuid.NewSHA1(sourceNamespace, []byte(chunkName))
+
+	return finalUUID.String()
 }

@@ -1,9 +1,10 @@
 package ingestion
 
 import (
-	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/google/uuid"
 )
 
 func newTestChunker(max, overlap int) *Chunker {
@@ -49,8 +50,8 @@ func TestChunk_ShortDocumentReturnsSingleChunk(t *testing.T) {
 	if chunks[0].Source != "short.txt" {
 		t.Errorf("source not set: %q", chunks[0].Source)
 	}
-	if chunks[0].ID != "short.txt-0" {
-		t.Errorf("ID not set: %q", chunks[0].ID)
+	if _, err := uuid.Parse(chunks[0].ID); err != nil {
+		t.Errorf("ID not a valid UUID: %q", chunks[0].ID)
 	}
 }
 
@@ -109,9 +110,8 @@ func TestChunk_MetadataIsSet(t *testing.T) {
 		if ch.Index != i {
 			t.Errorf("chunk %d: Index = %d, want %d", i, ch.Index, i)
 		}
-		wantID := fmt.Sprintf("meta.txt-%d", i)
-		if ch.ID != wantID {
-			t.Errorf("chunk %d: ID = %q, want %q", i, ch.ID, wantID)
+		if _, err := uuid.Parse(ch.ID); err != nil {
+			t.Errorf("chunk %d: ID not valid UUID: %q", i, ch.ID)
 		}
 	}
 }
