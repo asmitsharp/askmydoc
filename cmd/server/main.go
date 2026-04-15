@@ -1,14 +1,136 @@
-package server
+package main
 
 import (
+	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
 
+	"github.com/ashmitsharp/askmydocs/internal/api"
+	"github.com/ashmitsharp/askmydocs/internal/embedding"
+	"github.com/ashmitsharp/askmydocs/internal/ingestion"
+	"github.com/ashmitsharp/askmydocs/internal/llm"
+	"github.com/ashmitsharp/askmydocs/internal/pipeline"
+	"github.com/ashmitsharp/askmydocs/internal/storage"
 	"github.com/joho/godotenv"
 )
 
+type Config struct {
+	Port              string
+	EmbeddingProvider string
+	HFApiKey          string
+	OpenAIApiKey      string
+	QdrantHost        string
+	QdrantPort        int
+	QdrantCollection  string
+}
+
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Printf("no .env file loaded, continuing with environment: %v", err)
+	}
+	cfg := readConfig()
+
+	log.Printf("Embedding provider: %s", cfg.EmbeddingProvider)
+	log.Printf("Qdrant: %s:%d collection=%s", cfg.QdrantHost, cfg.QdrantPort, cfg.QdrantCollection)
+
+	ctx := context.Background()
+
+	embeddingKey := cfg.OpenAIApiKey
+	if strings.EqualFold(cfg.EmbeddingProvider, embedding.ProviderHuggingFace) {
+		embeddingKey = cfg.HFApiKey
 	}
 
+	embedder, err := embedding.NewClient(cfg.EmbeddingProvider, embeddingKey)
+	if err != nil {
+		log.Fatalf("failed to create embedder: %v", err)
+	}
+
+	var vectorSize uint64
+	if strings.EqualFold(cfg.EmbeddingProvider, embedding.ProviderHuggingFace) {
+		vectorSize = 384
+	} else {
+		vectorSize = 1536
+	}
+
+	store, err := storage.NewQdrantStore(ctx, cfg.QdrantHost, cfg.QdrantPort, cfg.QdrantCollection, vectorSize)
+	if err != nil {
+		log.Fatalf("failed to create qdrant store: %v", err)
+	}
+	defer func() {
+		if err := store.Close(); err != nil {
+			log.Printf("qdrant close error: %v", err)
+		}
+	}()
+
+	llmClient := llm.NewOpenAIClient(cfg.OpenAIApiKey)
+
+	loader := ingestion.NewRouter()
+	chunker := ingestion.NewTextChunker()
+	ingestionPipeLine := pipeline.NewPipeLine(loader, chunker, embedder, store)
+	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, llmClient)
+	handler := api.NewHandler(ingestionPipeLine, queryPipeLine)
+
+	server := &http.Server{
+		Addr:         ":" + cfg.Port,
+		Handler:      handler.Routes(),
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
+	go func() {
+		log.Printf("Server starting on :%s", cfg.Port)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("server error: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	log.Println("Shutting down...")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(shutdownCtx); err != nil {
+		log.Printf("server shutdown error: %v", err)
+	}
+}
+
+func readConfig() Config {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	qdrantPort := 6334
+	if p := os.Getenv("QDRANT_PORT"); p != "" {
+		if v, err := strconv.Atoi(p); err == nil {
+			qdrantPort = v
+		}
+	}
+
+	return Config{
+		Port:              port,
+		EmbeddingProvider: os.Getenv("EMBEDDING_PROVIDER"),
+		HFApiKey:          os.Getenv("HF_API_KEY"),
+		OpenAIApiKey:      os.Getenv("OPENAI_API_KEY"),
+		QdrantHost:        defaultString(os.Getenv("QDRANT_HOST"), "localhost"),
+		QdrantPort:        qdrantPort,
+		QdrantCollection:  defaultString(os.Getenv("QDRANT_COLLECTION"), "askmydocs"),
+	}
+}
+
+func defaultString(value, fallback string) string {
+	if value == "" {
+		return fallback
+	}
+	return value
 }
