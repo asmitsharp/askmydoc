@@ -1,6 +1,10 @@
 package storage
 
-import "context"
+import (
+	"context"
+
+	"github.com/ashmitsharp/askmydocs/internal/ingestion"
+)
 
 // point is a chunk vector + its metadata payload.
 type Point struct {
@@ -19,4 +23,8 @@ type VectorStore interface {
 	Upsert(ctx context.Context, points []Point) error
 	Search(ctx context.Context, vector []float32, topK int) ([]SearchResult, error)
 	Delete(ctx context.Context, ids []string) error
+}
+
+type ChunkStore interface {
+	Upsert(ctx context.Context, chunks []ingestion.Chunk) error
 }

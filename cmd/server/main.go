@@ -28,6 +28,7 @@ type Config struct {
 	QdrantHost        string
 	QdrantPort        int
 	QdrantCollection  string
+	PostgresDSN       string
 }
 
 func main() {
@@ -68,11 +69,17 @@ func main() {
 		}
 	}()
 
+	bm25store, err := storage.NewBM25Store(ctx, cfg.PostgresDSN)
+	if err != nil {
+		log.Fatalf("failed to create bm25 store: %v", err)
+	}
+	defer bm25store.Close()
+
 	llmClient := llm.NewOpenAIClient(cfg.OpenAIApiKey)
 
 	loader := ingestion.NewRouter()
 	chunker := ingestion.NewTextChunker()
-	ingestionPipeLine := pipeline.NewPipeLine(loader, chunker, embedder, store)
+	ingestionPipeLine := pipeline.NewPipeLine(loader, chunker, embedder, store, bm25store)
 	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, llmClient)
 	handler := api.NewHandler(ingestionPipeLine, queryPipeLine)
 
@@ -125,6 +132,7 @@ func readConfig() Config {
 		QdrantHost:        defaultString(os.Getenv("QDRANT_HOST"), "localhost"),
 		QdrantPort:        qdrantPort,
 		QdrantCollection:  defaultString(os.Getenv("QDRANT_COLLECTION"), "askmydocs"),
+		PostgresDSN:       defaultString(os.Getenv("POSTGRES_DSN"), "postgres://askmydocs:askmydocs@localhost:5432/askmydocs?sslmode=disable"),
 	}
 }
 

@@ -10,18 +10,20 @@ import (
 )
 
 type PipeLine struct {
-	loader   *ingestion.Router
-	chunker  *ingestion.Chunker
-	embedder embedding.Embedding
-	store    storage.VectorStore
+	loader     *ingestion.Router
+	chunker    *ingestion.Chunker
+	embedder   embedding.Embedding
+	store      storage.VectorStore
+	chunkStore storage.ChunkStore
 }
 
-func NewPipeLine(loader *ingestion.Router, chunker *ingestion.Chunker, embedder embedding.Embedding, store storage.VectorStore) *PipeLine {
+func NewPipeLine(loader *ingestion.Router, chunker *ingestion.Chunker, embedder embedding.Embedding, store storage.VectorStore, chunkStore storage.ChunkStore) *PipeLine {
 	return &PipeLine{
-		loader:   loader,
-		chunker:  chunker,
-		embedder: embedder,
-		store:    store,
+		loader:     loader,
+		chunker:    chunker,
+		embedder:   embedder,
+		store:      store,
+		chunkStore: chunkStore,
 	}
 }
 
@@ -65,8 +67,33 @@ func (p *PipeLine) Ingest(ctx context.Context, filepath string) (int, error) {
 		}
 	}
 
-	if err := p.store.Upsert(ctx, points); err != nil {
-		return 0, fmt.Errorf("failed to upsert points: %w", err)
+	// concurrent write to two differet data stores
+	errChan := make(chan error, 2)
+
+	// write to qdrant
+	go func() {
+		err := p.store.Upsert(ctx, points)
+		errChan <- err
+	}()
+
+	// write to postgres
+	go func() {
+		err := p.chunkStore.Upsert(ctx, chunks)
+		errChan <- err
+	}()
+
+	var qdrantErr, postgresErr error
+	for i := 0; i < 2; i++ {
+		err := <-errChan
+		if i == 0 {
+			qdrantErr = err
+		} else {
+			postgresErr = err
+		}
+	}
+
+	if qdrantErr != nil || postgresErr != nil {
+		return 0, fmt.Errorf("ingest failed: qdrant=%v, postgres=%v", qdrantErr, postgresErr)
 	}
 
 	fmt.Printf("Successfully ingested %d chunks from %s\n", len(chunks), document.Source)
