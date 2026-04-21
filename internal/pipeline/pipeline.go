@@ -27,10 +27,14 @@ func NewPipeLine(loader *ingestion.Router, chunker *ingestion.Chunker, embedder 
 	}
 }
 
-func (p *PipeLine) Ingest(ctx context.Context, filepath string) (int, error) {
+func (p *PipeLine) Ingest(ctx context.Context, filepath string, originalFilename string) (int, error) {
 	document, err := p.loader.Load(filepath)
 	if err != nil {
 		return 0, fmt.Errorf("failed to load document: %w", err)
+	}
+
+	if originalFilename != "" {
+		document.Source = originalFilename
 	}
 
 	chunks := []ingestion.Chunk{}
@@ -56,6 +60,16 @@ func (p *PipeLine) Ingest(ctx context.Context, filepath string) (int, error) {
 
 	points := make([]storage.Point, len(chunks))
 	for i, chunk := range chunks {
+		windowContent := chunk.Content
+
+		if i > 0 && chunks[i-1].Source == chunk.Source {
+			windowContent = chunks[i-1].Content + "\n\n" + windowContent
+		}
+
+		if i < len(chunks)-1 && chunks[i+1].Source == chunk.Source {
+			windowContent = windowContent + "\n\n" + chunks[i+1].Content
+		}
+
 		points[i].ID = chunk.ID
 		points[i].Vector = vectors[i]
 		points[i].Payload = map[string]any{
@@ -64,6 +78,7 @@ func (p *PipeLine) Ingest(ctx context.Context, filepath string) (int, error) {
 			"pageEnd":     chunk.PageEnd,
 			"chunk_index": chunk.Index,
 			"content":     chunk.Content,
+			"window":      windowContent,
 		}
 	}
 

@@ -128,7 +128,7 @@ func (h *Handler) HandleIngest(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpFile.Close()
 
-	numChunks, err := h.ingest.Ingest(r.Context(), tmpFile.Name())
+	numChunks, err := h.ingest.Ingest(r.Context(), tmpFile.Name(), header.Filename)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, fmt.Sprintf("ingestion failed: %v", err))
 		return

@@ -102,7 +102,11 @@ func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, 
 	if q.reranker != nil {
 		documents := make([]string, len(fused))
 		for i, fr := range fused {
-			documents[i] = fr.Payload["content"].(string)
+			if window, ok := fr.Payload["window"]; ok && strings.TrimSpace(window.(string)) != "" {
+				documents[i] = window.(string)
+			} else {
+				documents[i] = fr.Payload["content"].(string)
+			}
 		}
 
 		rerankResults, err := q.reranker.Rerank(ctx, question, documents, q.rerankTopN)
@@ -128,9 +132,9 @@ func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, 
 	selected := make([]Citation, 0, len(finalResults))
 	tokenUsed := 0
 	for _, fr := range finalResults {
-		content, ok := fr.Payload["content"].(string)
+		content, ok := fr.Payload["window"].(string)
 		if !ok || strings.TrimSpace(content) == "" {
-			continue
+			content = fr.Payload["content"].(string)
 		}
 
 		tokenChunk := ingestion.EstimateTokens(content)
