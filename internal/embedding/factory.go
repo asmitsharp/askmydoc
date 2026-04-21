@@ -1,6 +1,7 @@
 package embedding
 
 import (
+	"context"
 	"fmt"
 	"strings"
 )
@@ -8,6 +9,7 @@ import (
 const (
 	ProviderOpenAI      = "openai"
 	ProviderHuggingFace = "huggingface"
+	ProviderGemini      = "gemini"
 )
 
 func NewClient(provider, apiKey string) (Embedding, error) {
@@ -16,6 +18,9 @@ func NewClient(provider, apiKey string) (Embedding, error) {
 		return NewOpenAIClient(apiKey), nil
 	case ProviderHuggingFace, "hf":
 		return NewHFClient(apiKey), nil
+	case ProviderGemini:
+		importCtx := context.Background()
+		return NewGeminiClient(importCtx, apiKey)
 	default:
 		return nil, fmt.Errorf("unsupported embedding provider %q", provider)
 	}

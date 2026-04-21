@@ -32,6 +32,8 @@ type Config struct {
 	PostgresDSN       string
 	RerankEnabled     bool
 	CohereApiKey      string
+	LLMProvider       string
+	GeminiApiKey      string
 }
 
 func main() {
@@ -48,6 +50,8 @@ func main() {
 	embeddingKey := cfg.OpenAIApiKey
 	if strings.EqualFold(cfg.EmbeddingProvider, embedding.ProviderHuggingFace) {
 		embeddingKey = cfg.HFApiKey
+	} else if strings.EqualFold(cfg.EmbeddingProvider, "gemini") {
+		embeddingKey = cfg.GeminiApiKey
 	}
 
 	embedder, err := embedding.NewClient(cfg.EmbeddingProvider, embeddingKey)
@@ -58,6 +62,8 @@ func main() {
 	var vectorSize uint64
 	if strings.EqualFold(cfg.EmbeddingProvider, embedding.ProviderHuggingFace) {
 		vectorSize = 384
+	} else if strings.EqualFold(cfg.EmbeddingProvider, "gemini") {
+		vectorSize = 768
 	} else {
 		vectorSize = 1536
 	}
@@ -78,7 +84,16 @@ func main() {
 	}
 	defer bm25store.Close()
 
-	llmClient := llm.NewOpenAIClient(cfg.OpenAIApiKey)
+	var llmClient llm.LLM
+	if strings.EqualFold(cfg.LLMProvider, "gemini") {
+		client, err := llm.NewGeminiClient(ctx, cfg.GeminiApiKey)
+		if err != nil {
+			log.Fatalf("failed to create gemini client: %v", err)
+		}
+		llmClient = client
+	} else {
+		llmClient = llm.NewOpenAIClient(cfg.OpenAIApiKey)
+	}
 
 	var reranker retrieval.Reranker
 	if cfg.RerankEnabled {
@@ -145,6 +160,8 @@ func readConfig() Config {
 		PostgresDSN:       defaultString(os.Getenv("POSTGRES_DSN"), "postgres://askmydocs:askmydocs@localhost:5432/askmydocs?sslmode=disable"),
 		RerankEnabled:     os.Getenv("RERANK_ENABLED") == "true",
 		CohereApiKey:      os.Getenv("COHERE_API_KEY"),
+		LLMProvider:       defaultString(os.Getenv("LLM_PROVIDER"), "openai"),
+		GeminiApiKey:      os.Getenv("GEMINI_API_KEY"),
 	}
 }
 
