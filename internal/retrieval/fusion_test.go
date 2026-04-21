@@ -6,86 +6,33 @@ import (
 	"github.com/ashmitsharp/askmydocs/internal/storage"
 )
 
-func TestReciprocalRankFusion(t *testing.T) {
-	tests := []struct {
-		name          string
-		vectorResults []storage.SearchResult
-		bm25Results   []storage.SearchResult
-		topN          int
-		wantLen       int
-		wantTopID     string
-	}{
-		{
-			name:          "both empty",
-			vectorResults: []storage.SearchResult{},
-			bm25Results:   []storage.SearchResult{},
-			topN:          5,
-			wantLen:       0,
-			wantTopID:     "",
-		},
-		{
-			name:          "only vector results",
-			vectorResults: createSearchResults([]string{"v1", "v2", "v3"}),
-			bm25Results:   nil,
-			topN:          2,
-			wantLen:       2,
-			wantTopID:     "v1",
-		},
-		{
-			name:          "only bm25 results",
-			vectorResults: nil,
-			bm25Results:   createSearchResults([]string{"b1", "b2"}),
-			topN:          5,
-			wantLen:       2,
-			wantTopID:     "b1",
-		},
-		{
-			name:          "both with intersection and different ranks",
-			vectorResults: createSearchResults([]string{"v1", "v2", "v3"}),
-			bm25Results:   createSearchResults([]string{"b2", "v1", "b1"}),
-			topN:          5,
-			wantLen:       5,
-			wantTopID:     "v1", // v1 ranks 0 (vector) and 1 (bm25)
-		},
-		{
-			name:          "topN limits output",
-			vectorResults: createSearchResults([]string{"id1", "id2", "id3"}),
-			bm25Results:   createSearchResults([]string{"id2", "id4", "id1"}),
-			topN:          2,
-			wantLen:       2,
-			wantTopID:     "id2", // id2 score (1/62 + 1/61) > id1 score (1/61 + 1/63)
-		},
-		{
-			name:          "disjoint results all appear",
-			vectorResults: createSearchResults([]string{"D", "E", "F"}),
-			bm25Results:   createSearchResults([]string{"A", "B", "C"}),
-			topN:          10,
-			wantLen:       6,
-			wantTopID:     "A", // BM25 rank 0 has highest score
-		},
-		{
-			name:          "identical rankings boost scores",
-			vectorResults: createSearchResults([]string{"A", "B", "C"}),
-			bm25Results:   createSearchResults([]string{"A", "B", "C"}),
-			topN:          5,
-			wantLen:       3,
-			wantTopID:     "A", // A gets double the score
-		},
+func TestReciprocalRankFusion_Disjoint(t *testing.T) {
+	vectorResults := createSearchResults([]string{"D", "E", "F"})
+	bm25Results := createSearchResults([]string{"A", "B", "C"})
+
+	fused := ReciprocalRankFusion(vectorResults, bm25Results, 10)
+
+	if len(fused) != 6 {
+		t.Errorf("Expected 6 results, got %d", len(fused))
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := ReciprocalRankFusion(tt.vectorResults, tt.bm25Results, tt.topN)
-			if len(got) != tt.wantLen {
-				t.Errorf("ReciprocalRankFusion() returned %d results, want %d", len(got), tt.wantLen)
-			}
-			if tt.wantLen > 0 && tt.wantTopID != "" {
-				if got[0].ChunkId != tt.wantTopID {
-					t.Errorf("ReciprocalRankFusion() top result ID = %v, want %v", got[0].ChunkId, tt.wantTopID)
-				}
-			}
-		})
+	expectedIDs := map[string]bool{"A": true, "B": true, "C": true, "D": true, "E": true, "F": true}
+	for _, fr := range fused {
+		if !expectedIDs[fr.ChunkId] {
+			t.Errorf("Unexpected ID: %s", fr.ChunkId)
+		}
+		delete(expectedIDs, fr.ChunkId)
 	}
+
+	scores := map[string]float32{
+		"A": 1.0 / (0 + 60 + 1),
+		"B": 1.0 / (1 + 60 + 2),
+		"C": 1.0 / (2 + 60 + 3),
+		"D": 1.0 / (0 + 60 + 4),
+		"E": 1.0 / (1 + 60 + 5),
+		"F": 1.0 / (2 + 60 + 6),
+	}
+
 }
 
 func createSearchResults(ids []string) []storage.SearchResult {

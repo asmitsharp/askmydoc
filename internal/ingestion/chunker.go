@@ -1,7 +1,6 @@
 package ingestion
 
 import (
-	"fmt"
 	"strings"
 	"unicode/utf8"
 
@@ -74,7 +73,7 @@ func (c *Chunker) Chunk(doc *Document) []Chunk {
 	if EstimateTokens(doc.Content) <= c.MaxChunkTokens {
 		return []Chunk{
 			{
-				ID:      chunkID(doc.Source, 0),
+				ID:      chunkID(doc.Content),
 				Content: doc.Content,
 				Index:   0,
 				Source:  doc.Source,
@@ -104,7 +103,7 @@ func (c *Chunker) ChunkPages(doc *Document) []Chunk {
 
 		for _, ch := range pageChunks {
 			ch.Index = globalIndex
-			ch.ID = chunkID(doc.Source, globalIndex)
+			ch.ID = chunkID(ch.Content)
 			ch.PageStart = page.Number
 			ch.PageEnd = page.Number
 			all = append(all, ch)
@@ -157,7 +156,7 @@ func (c *Chunker) mergeSplits(splits []string, source string) []Chunk {
 
 		idx := len(chunks)
 		chunks = append(chunks, Chunk{
-			ID:      chunkID(source, idx),
+			ID:      chunkID(current),
 			Content: current,
 			Index:   idx,
 			Source:  source,
@@ -238,14 +237,9 @@ var docNamespace = uuid.Must(uuid.Parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8"))
 // chunkID generates a deterministic UUID v5 for a chunk.
 // The same source and index will always produce the same UUID,
 // making re-indexing idempotent and compatible with Qdrant.
-func chunkID(source string, index int) string {
+func chunkID(content string) string {
 	// Create a namespace for this source to avoid collisions
 	// across different sources
-	sourceNamespace := uuid.NewSHA1(docNamespace, []byte(source))
-
-	// Create the final UUID from source namespace + index
-	chunkName := fmt.Sprintf("%d", index)
-	finalUUID := uuid.NewSHA1(sourceNamespace, []byte(chunkName))
-
+	finalUUID := uuid.NewSHA1(docNamespace, []byte(content))
 	return finalUUID.String()
 }

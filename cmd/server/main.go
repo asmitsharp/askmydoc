@@ -97,7 +97,7 @@ func main() {
 
 	var reranker retrieval.Reranker
 	if cfg.RerankEnabled {
-		reranker = retrieval.NewCohereReranker(cfg.CohereApiKey, "rerank-english-v2.0")
+		reranker = retrieval.NewCohereReranker(cfg.CohereApiKey, "rerank-english-v3.0")
 	} else {
 		reranker = nil
 	}

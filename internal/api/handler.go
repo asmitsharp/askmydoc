@@ -73,11 +73,13 @@ func (h *Handler) HandleQuery(w http.ResponseWriter, r *http.Request) {
 	}
 	if strings.TrimSpace(req.Question) == "" {
 		writeError(w, http.StatusBadRequest, "question cannot be empty")
+		return
 	}
 	start := time.Now()
 	answer, citations, queryErr := h.query.Execute(r.Context(), req.Question)
 	if queryErr != nil {
 		writeError(w, http.StatusInternalServerError, queryErr.Error())
+		return
 	}
 	latency := time.Since(start).Milliseconds()
 	citationsJSON := make([]citationJson, len(citations))
