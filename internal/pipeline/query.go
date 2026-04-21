@@ -8,6 +8,7 @@ import (
 	"github.com/ashmitsharp/askmydocs/internal/embedding"
 	"github.com/ashmitsharp/askmydocs/internal/ingestion"
 	"github.com/ashmitsharp/askmydocs/internal/llm"
+	"github.com/ashmitsharp/askmydocs/internal/retrieval"
 	"github.com/ashmitsharp/askmydocs/internal/storage"
 )
 
@@ -23,20 +24,28 @@ type Citation struct {
 }
 
 type QueryPipeLine struct {
-	embedder  embedding.Embedding
-	store     storage.VectorStore
-	llm       llm.LLM
-	topK      int
-	maxTokens int
+	embedder   embedding.Embedding
+	store      storage.VectorStore
+	bm25Store  *storage.BM25Store
+	llm        llm.LLM
+	topK       int
+	maxTokens  int
+	fusionTopN int
+	rerankTopN int
+	reranker   retrieval.Reranker
 }
 
-func NewQueryPipeLine(embedder embedding.Embedding, store storage.VectorStore, llm llm.LLM) *QueryPipeLine {
+func NewQueryPipeLine(embedder embedding.Embedding, store storage.VectorStore, bm25Store *storage.BM25Store, llm llm.LLM, reranker retrieval.Reranker) *QueryPipeLine {
 	return &QueryPipeLine{
-		embedder:  embedder,
-		store:     store,
-		llm:       llm,
-		topK:      5,
-		maxTokens: 3000,
+		embedder:   embedder,
+		store:      store,
+		bm25Store:  bm25Store,
+		llm:        llm,
+		topK:       5,
+		maxTokens:  3000,
+		fusionTopN: 20,
+		rerankTopN: 5,
+		reranker:   reranker,
 	}
 }
 
@@ -46,18 +55,80 @@ func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, 
 		return nil, nil, fmt.Errorf("question vector cannot be created : %w", err)
 	}
 
-	results, err := q.store.Search(ctx, questionVector[0], q.topK)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error while searching the database : %w", err)
-	}
-	if len(results) == 0 {
-		return nil, nil, fmt.Errorf("for the given question could not find relevant vectors")
+	// Concurrent searches
+	vectorCh := make(chan []storage.SearchResult, 1)
+	bm25Ch := make(chan []storage.SearchResult, 1)
+	errCh := make(chan error, 2)
+
+	go func() {
+		results, err := q.store.Search(ctx, questionVector[0], q.fusionTopN)
+		if err != nil {
+			errCh <- err
+			return
+		}
+		vectorCh <- results
+	}()
+
+	go func() {
+		results, err := q.bm25Store.Search(ctx, question, q.fusionTopN)
+		if err != nil {
+			errCh <- err
+			return
+		}
+		bm25Ch <- results
+	}()
+
+	var vectorResults, bm25Results []storage.SearchResult
+	select {
+	case err := <-errCh:
+		return nil, nil, fmt.Errorf("search error: %w", err)
+	case vectorResults = <-vectorCh:
+		select {
+		case err := <-errCh:
+			return nil, nil, fmt.Errorf("search error: %w", err)
+		case bm25Results = <-bm25Ch:
+			// Both done
+		}
 	}
 
-	selected := make([]Citation, 0, len(results))
+	// Fuse results
+	fused := retrieval.ReciprocalRankFusion(vectorResults, bm25Results, q.fusionTopN)
+	if len(fused) == 0 {
+		return nil, nil, fmt.Errorf("no relevant results found after fusion")
+	}
+
+	// Optional reranking
+	var finalResults []retrieval.FusedResult
+	if q.reranker != nil {
+		documents := make([]string, len(fused))
+		for i, fr := range fused {
+			documents[i] = fr.Payload["content"].(string)
+		}
+
+		rerankResults, err := q.reranker.Rerank(ctx, question, documents, q.rerankTopN)
+		if err != nil {
+			return nil, nil, fmt.Errorf("reranking failed: %w", err)
+		}
+
+		// Reorder based on rerank indices
+		finalResults = make([]retrieval.FusedResult, len(rerankResults))
+		for i, rr := range rerankResults {
+			finalResults[i] = fused[rr.Index]
+			finalResults[i].RRFScore = rr.RelevanceScore
+		}
+	} else {
+		// Take top rerankTopN from fused
+		if len(fused) > q.rerankTopN {
+			finalResults = fused[:q.rerankTopN]
+		} else {
+			finalResults = fused
+		}
+	}
+
+	selected := make([]Citation, 0, len(finalResults))
 	tokenUsed := 0
-	for _, result := range results {
-		content, ok := result.Payload["content"].(string)
+	for _, fr := range finalResults {
+		content, ok := fr.Payload["content"].(string)
 		if !ok || strings.TrimSpace(content) == "" {
 			continue
 		}
@@ -69,9 +140,9 @@ func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, 
 
 		tokenUsed += tokenChunk
 		selected = append(selected, Citation{
-			Source:     toString(result.Payload["source"]),
-			ChunkIndex: toInt(result.Payload["chunk_index"]),
-			Score:      result.Score,
+			Source:     toString(fr.Payload["source"]),
+			ChunkIndex: toInt(fr.Payload["chunk_index"]),
+			Score:      float32(fr.RRFScore),
 			Content:    content,
 		})
 	}

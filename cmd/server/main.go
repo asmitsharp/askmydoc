@@ -16,6 +16,7 @@ import (
 	"github.com/ashmitsharp/askmydocs/internal/ingestion"
 	"github.com/ashmitsharp/askmydocs/internal/llm"
 	"github.com/ashmitsharp/askmydocs/internal/pipeline"
+	"github.com/ashmitsharp/askmydocs/internal/retrieval"
 	"github.com/ashmitsharp/askmydocs/internal/storage"
 	"github.com/joho/godotenv"
 )
@@ -29,6 +30,8 @@ type Config struct {
 	QdrantPort        int
 	QdrantCollection  string
 	PostgresDSN       string
+	RerankEnabled     bool
+	CohereApiKey      string
 }
 
 func main() {
@@ -77,10 +80,17 @@ func main() {
 
 	llmClient := llm.NewOpenAIClient(cfg.OpenAIApiKey)
 
+	var reranker retrieval.Reranker
+	if cfg.RerankEnabled {
+		reranker = retrieval.NewCohereReranker(cfg.CohereApiKey, "rerank-english-v2.0")
+	} else {
+		reranker = nil
+	}
+
 	loader := ingestion.NewRouter()
 	chunker := ingestion.NewTextChunker()
 	ingestionPipeLine := pipeline.NewPipeLine(loader, chunker, embedder, store, bm25store)
-	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, llmClient)
+	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, bm25store, llmClient, reranker)
 	handler := api.NewHandler(ingestionPipeLine, queryPipeLine)
 
 	server := &http.Server{
@@ -133,6 +143,8 @@ func readConfig() Config {
 		QdrantPort:        qdrantPort,
 		QdrantCollection:  defaultString(os.Getenv("QDRANT_COLLECTION"), "askmydocs"),
 		PostgresDSN:       defaultString(os.Getenv("POSTGRES_DSN"), "postgres://askmydocs:askmydocs@localhost:5432/askmydocs?sslmode=disable"),
+		RerankEnabled:     os.Getenv("RERANK_ENABLED") == "true",
+		CohereApiKey:      os.Getenv("COHERE_API_KEY"),
 	}
 }
 
