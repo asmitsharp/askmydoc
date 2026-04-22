@@ -92,15 +92,25 @@ func (b *BM25Store) Upsert(ctx context.Context, chunks []ingestion.Chunk) error 
 	return nil
 }
 
-func (b *BM25Store) Search(ctx context.Context, query string, topK int) ([]SearchResult, error) {
+func (b *BM25Store) Search(ctx context.Context, query string, topK int, filter *MetadataFilter) ([]SearchResult, error) {
 	stmt := `
         SELECT id, content, source, chunk_index, ts_rank(tsv, q) AS score
         FROM chunks, plainto_tsquery('english', $1) q
         WHERE tsv @@ q
-        ORDER BY score DESC
-        LIMIT $2
     `
-	rows, err := b.pool.Query(ctx, stmt, query, topK)
+	args := []any{query}
+
+	if filter != nil && filter.Filename != "" {
+		stmt += ` AND source = $2`
+		args = append(args, filter.Filename)
+
+		stmt += ` ORDER BY score DESC LIMIT $3`
+		args = append(args, topK)
+	} else {
+		stmt += ` ORDER BY score DESC LIMIT $2`
+		args = append(args, topK)
+	}
+	rows, err := b.pool.Query(ctx, stmt, args...)
 	if err != nil {
 		return nil, fmt.Errorf("search query: %w", err)
 	}

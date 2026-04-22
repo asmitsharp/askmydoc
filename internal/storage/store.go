@@ -19,9 +19,13 @@ type SearchResult struct {
 	Payload map[string]any
 }
 
+type MetadataFilter struct {
+	Filename string `json:"filename,omitempty"`
+}
+
 type VectorStore interface {
 	Upsert(ctx context.Context, points []Point) error
-	Search(ctx context.Context, vector []float32, topK int) ([]SearchResult, error)
+	Search(ctx context.Context, vector []float32, topK int, filter *MetadataFilter) ([]SearchResult, error)
 	Delete(ctx context.Context, ids []string) error
 }
 

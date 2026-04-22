@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ashmitsharp/askmydocs/internal/pipeline"
+	"github.com/ashmitsharp/askmydocs/internal/storage"
 )
 
 type Handler struct {
@@ -39,7 +40,8 @@ type citationJson struct {
 }
 
 type QueryRequest struct {
-	Question string `json:"question"`
+	Question string                  `json:"question"`
+	Filter   *storage.MetadataFilter `json:"filter,omitempty"`
 }
 
 type IngestResponse struct {
@@ -76,7 +78,7 @@ func (h *Handler) HandleQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	start := time.Now()
-	answer, citations, queryErr := h.query.Execute(r.Context(), req.Question)
+	answer, citations, queryErr := h.query.Execute(r.Context(), req.Question, req.Filter)
 	if queryErr != nil {
 		writeError(w, http.StatusInternalServerError, queryErr.Error())
 		return

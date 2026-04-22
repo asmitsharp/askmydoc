@@ -46,7 +46,7 @@ func TestBM25Search(t *testing.T) {
 	}
 
 	// Test 1: Search for "authentication token expiry" — should find chunk 3
-	results, err := store.Search(ctx, "authentication token expiry", 10)
+	results, err := store.Search(ctx, "authentication token expiry", 10, nil)
 	if err != nil {
 		t.Fatalf("search failed: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestBM25Search(t *testing.T) {
 	t.Logf("✓ Chunk 1 ranked second with score %f", chunk1Score)
 
 	// Test 2: Search for something that exists in NO chunks
-	emptyResults, err := store.Search(ctx, "kubernetes deployment", 10)
+	emptyResults, err := store.Search(ctx, "kubernetes deployment", 10, nil)
 	if err != nil {
 		t.Fatalf("search failed: %v", err)
 	}

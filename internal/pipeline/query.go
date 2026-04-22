@@ -3,6 +3,7 @@ package pipeline
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/ashmitsharp/askmydocs/internal/embedding"
@@ -49,7 +50,7 @@ func NewQueryPipeLine(embedder embedding.Embedding, store storage.VectorStore, b
 	}
 }
 
-func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, []Citation, error) {
+func (q *QueryPipeLine) Execute(ctx context.Context, question string, filter *storage.MetadataFilter) (*Answer, []Citation, error) {
 	questionVector, err := q.embedder.Embed(ctx, []string{question})
 	if err != nil {
 		return nil, nil, fmt.Errorf("question vector cannot be created : %w", err)
@@ -61,7 +62,7 @@ func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, 
 	errCh := make(chan error, 2)
 
 	go func() {
-		results, err := q.store.Search(ctx, questionVector[0], q.fusionTopN)
+		results, err := q.store.Search(ctx, questionVector[0], q.fusionTopN, filter)
 		if err != nil {
 			errCh <- err
 			return
@@ -70,7 +71,7 @@ func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, 
 	}()
 
 	go func() {
-		results, err := q.bm25Store.Search(ctx, question, q.fusionTopN)
+		results, err := q.bm25Store.Search(ctx, question, q.fusionTopN, filter)
 		if err != nil {
 			errCh <- err
 			return
@@ -161,7 +162,38 @@ func (q *QueryPipeLine) Execute(ctx context.Context, question string) (*Answer, 
 		return nil, nil, fmt.Errorf("error generating answer: %w", err)
 	}
 
-	return &Answer{Text: answerText}, selected, nil
+	re := regexp.MustCompile(`\[Source: (.*?), Chunk (\d+)\]`)
+	matches := re.FindAllStringSubmatch(answerText, -1)
+
+	validCitations := make([]Citation, 0)
+	citationSet := make(map[string]bool)
+
+	for _, match := range matches {
+		if len(match) == 3 {
+			src := match[1]
+			var chunkIdx int
+			fmt.Scanf(match[2], "%d", &chunkIdx)
+			chunkIdx -= 1
+			found := false
+			for _, sel := range selected {
+				if sel.Source == src && sel.ChunkIndex == chunkIdx {
+					found = true
+					key := fmt.Sprintf("%s-%d", sel.Source, sel.ChunkIndex)
+
+					if !citationSet[key] {
+						validCitations = append(validCitations, sel)
+						citationSet[key] = true
+					}
+					break
+				}
+			}
+			if !found {
+				answerText = strings.Replace(answerText, match[0], "", -1)
+			}
+		}
+	}
+
+	return &Answer{Text: answerText}, validCitations, nil
 }
 
 func (q *QueryPipeLine) buildPrompt(question string, citations []Citation) string {

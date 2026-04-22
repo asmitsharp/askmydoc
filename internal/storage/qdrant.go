@@ -68,15 +68,35 @@ func (q *QdrantStore) upsertBatch(ctx context.Context, batch []Point) error {
 }
 
 // returns the topK most similar points to the query vector.
-func (q *QdrantStore) Search(ctx context.Context, vector []float32, topK int) ([]SearchResult, error) {
+func (q *QdrantStore) Search(ctx context.Context, vector []float32, topK int, filter *MetadataFilter) ([]SearchResult, error) {
 	limit := uint64(topK)
 	withPayload := qdrant.NewWithPayload(true)
 
+	var qFilter *qdrant.Filter
+	if filter != nil && filter.Filename != "" {
+		qFilter = &qdrant.Filter{
+			Must: []*qdrant.Condition{
+				{
+					ConditionOneOf: &qdrant.Condition_Field{
+						Field: &qdrant.FieldCondition{
+							Key: "source",
+							Match: &qdrant.Match{
+								MatchValue: &qdrant.Match_Keyword{
+									Keyword: filter.Filename,
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+	}
 	results, err := q.client.Query(ctx, &qdrant.QueryPoints{
 		CollectionName: q.collection,
 		Query:          qdrant.NewQuery(vector...),
 		Limit:          &limit,
 		WithPayload:    withPayload,
+		Filter:         qFilter,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("qdrant: search: %w", err)
