@@ -55,6 +55,7 @@ require (
 	github.com/ebitengine/purego v0.9.1 // indirect
 	github.com/joho/godotenv v1.5.1
 	github.com/jupiterrider/ffi v0.5.0 // indirect
+	github.com/sashabaranov/go-openai v1.41.2
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/time v0.15.0
 )

@@ -36,7 +36,7 @@ func TestQdrantStoreIntegration(t *testing.T) {
 		t.Fatalf("Upsert: %v", err)
 	}
 
-	results, err := store.Search(ctx, []float32{0.1, 0.2, 0.3, 0.4}, 2)
+	results, err := store.Search(ctx, []float32{0.1, 0.2, 0.3, 0.4}, 2, nil)
 	if err != nil {
 		t.Fatalf("Search: %v", err)
 	}

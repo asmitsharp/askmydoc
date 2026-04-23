@@ -93,9 +93,19 @@ func (b *BM25Store) Upsert(ctx context.Context, chunks []ingestion.Chunk) error 
 }
 
 func (b *BM25Store) Search(ctx context.Context, query string, topK int, filter *MetadataFilter) ([]SearchResult, error) {
+	// Use OR-based matching: plainto_tsquery uses AND between all terms, which
+	// fails for natural-language questions (e.g. "What was TCS's total revenue")
+	// because all 9+ words must appear in a single chunk. OR matching retrieves
+	// chunks containing ANY query terms, ranked by ts_rank (which scores higher
+	// when more terms match).
 	stmt := `
         SELECT id, content, source, chunk_index, ts_rank(tsv, q) AS score
-        FROM chunks, plainto_tsquery('english', $1) q
+        FROM chunks, to_tsquery('english', 
+            array_to_string(
+                array(SELECT lexeme FROM unnest(to_tsvector('english', $1)) ORDER BY lexeme),
+                ' | '
+            )
+        ) q
         WHERE tsv @@ q
     `
 	args := []any{query}

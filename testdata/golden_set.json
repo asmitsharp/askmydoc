@@ -1,0 +1,918 @@
+[
+    {
+        "id": "tc_001",
+        "question": "What was TCS's total revenue from operations for the year ended March 31, 2026?",
+        "expected_answer_contains": "2,67,021 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Profit and Loss - Revenue from operations line",
+        "rationale": "Direct single-value lookup from P&L. Tests basic BM25 keyword match on 'revenue from operations'.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_002",
+        "question": "What is the basic and diluted earnings per equity share for FY2026?",
+        "expected_answer_contains": "136.01",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Profit and Loss - EPS section at bottom",
+        "rationale": "Tests retrieval of a specific metric buried at the bottom of the P&L statement.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_003",
+        "question": "What was the total equity attributable to shareholders of TCS as of March 31, 2026?",
+        "expected_answer_contains": "1,07,240 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Balance Sheet - Equity section, 'Equity attributable to shareholders of the Company'",
+        "rationale": "Tests retrieval of a balance sheet line item with a long label \u2014 semantic similarity challenge.",
+        "source_chunks": [
+            {
+                "qdrant_id": "42ed9c19-6c96-59a8-9f03-7820ca5169d1",
+                "chunk_index": 0,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Balance Sheet\n\n(= crore)\n\nNote As at As at\n\nMarch 31, 2026 March 31, 2025\n\nASSETS\n\nNon-current assets\n\nProperty, plant and equipment 10(a) 11,032 10,978\n\nCapital work-in-progress 10(a) 2,665 1,546\n\nRight-of-use assets 9 11,027 9,275\n\nGoodwill 10(b) 9,108 1,860\n\nOther intangible assets 10(c) 176 940\n\nFinancial assets\n\nInvestments 8(a) 218 275\n\nTrade receivables\n\nBilled 8(b) 99 91\n\nUnbilled 114 33\n\nLoans 8(e) 775 25\n\nOther financial assets 8(f) 2,944 2,731\n\nDeferred tax assets (net) 17 4,465 3,578\n\nIncome tax assets (net) 1,439 1,569\n\nOther assets 10(d) 2,605 3,712\n\nTotal non-current assets 46,667 36,618\n\nCurrent assets\n\nInventories 10(e) 29 21\n\n"
+            }
+        ]
+    },
+    {
+        "id": "tc_004",
+        "question": "How much did TCS pay as dividends to equity shareholders during FY2026?",
+        "expected_answer_contains": "39,437 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Cash Flows - Financing activities, 'Dividend paid'",
+        "rationale": "Tests lookup of a cash flow line item under a specific activity category.",
+        "source_chunks": [
+            {
+                "qdrant_id": "bf2a04c4-d114-54cb-b4e7-d7e51707b846",
+                "chunk_index": 6,
+                "source": "Consolidated.pdf",
+                "text": "Dividend - - - (44,864) - - - - - (44,864) (98) (44,962)\n\nTransfer from Special Economic Zone - - (15,149) 15,149 - - - - - - - -\n\nre-investment reserve\n\nTransfer to reserves - - - (13) 13 - - - - - - -\n\nSale of shares to non-controlling interests - - - 7 - - - - - 7 21 28\n\nBalance as at March 31, 2025 75 444 1,085 88,777 173 655 9 (24) 3,200 94,394 1,015 95,409\n\nGain of 3368 crore and loss of 388 crore on remeasurement of defined employee benefit plans (net of tax) is recognised as a part of retained earnings for the years ended March 31, 2026 and 2025, respectively.\n\nTotal equity (primarily retained earnings) includes 31,432 crore and 21,570 crore as at March 31, 2026 and 2025, respectivel"
+            }
+        ]
+    },
+    {
+        "id": "tc_005",
+        "question": "What percentage of TCS equity shares does Tata Sons Private Limited hold as of March 31, 2026?",
+        "expected_answer_contains": "71.74%",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 8(m) - Equity instruments, Section IV: Details of shareholders holding more than 5%",
+        "rationale": "Tests retrieval from a tabular note section on shareholding.",
+        "source_chunks": [
+            {
+                "qdrant_id": "49f15edf-18b5-561d-a938-cb410c4b1c63",
+                "chunk_index": 54,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nNotes forming part of consolidated financial statements\n\n(m) Equity instruments\n\nThe authorised, issued, subscribed and fully paid up share capital consist of the following:\n\n(\u00ae crore)\n\nAs at As at\n\nMarch 31, 2026 March 31, 2025\n\nAuthorised\n\n460,05,00,000 equity shares of %1 each 460 460\n\n(March 31, 2025: 460,05,00,000 equity shares of %1 each)\n\n105,02,50,000 preference shares of %1 each 105 105\n\n(March 31, 2025: 105,02,50,000 preference shares of %1 each)\n\n565 565\n\nIssued, Subscribed and Fully paid up\n\n361,80,87,518 equity shares of %1 each 362 362\n\n(March 31, 2025: 361,80,87,518 equity shares of \u20ac1 each)\n\n362 362\n\nThe Company\u2019s objective for capital manag"
+            }
+        ]
+    },
+    {
+        "id": "tc_006",
+        "question": "What was TCS's total employee benefit expenses in FY2026?",
+        "expected_answer_contains": "1,54,994 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Profit and Loss - Expenses section, 'Employee benefit expenses'",
+        "rationale": "Tests retrieval of the single largest cost line item for a services company.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_007",
+        "question": "What was the goodwill balance on TCS's balance sheet as of March 31, 2026?",
+        "expected_answer_contains": "9,108 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Balance Sheet - Non-current assets section, 'Goodwill'",
+        "rationale": "Tests retrieval of a non-current asset line. Goodwill jumped significantly due to acquisitions.",
+        "source_chunks": [
+            {
+                "qdrant_id": "42ed9c19-6c96-59a8-9f03-7820ca5169d1",
+                "chunk_index": 0,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Balance Sheet\n\n(= crore)\n\nNote As at As at\n\nMarch 31, 2026 March 31, 2025\n\nASSETS\n\nNon-current assets\n\nProperty, plant and equipment 10(a) 11,032 10,978\n\nCapital work-in-progress 10(a) 2,665 1,546\n\nRight-of-use assets 9 11,027 9,275\n\nGoodwill 10(b) 9,108 1,860\n\nOther intangible assets 10(c) 176 940\n\nFinancial assets\n\nInvestments 8(a) 218 275\n\nTrade receivables\n\nBilled 8(b) 99 91\n\nUnbilled 114 33\n\nLoans 8(e) 775 25\n\nOther financial assets 8(f) 2,944 2,731\n\nDeferred tax assets (net) 17 4,465 3,578\n\nIncome tax assets (net) 1,439 1,569\n\nOther assets 10(d) 2,605 3,712\n\nTotal non-current assets 46,667 36,618\n\nCurrent assets\n\nInventories 10(e) 29 21\n\n"
+            }
+        ]
+    },
+    {
+        "id": "tc_008",
+        "question": "What was the net cash generated from operating activities in FY2026?",
+        "expected_answer_contains": "52,094 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Cash Flows - 'Net cash flows generated from operating activities'",
+        "rationale": "Tests lookup of a subtotal in the cash flow statement.",
+        "source_chunks": [
+            {
+                "qdrant_id": "bf2a04c4-d114-54cb-b4e7-d7e51707b846",
+                "chunk_index": 6,
+                "source": "Consolidated.pdf",
+                "text": "Dividend - - - (44,864) - - - - - (44,864) (98) (44,962)\n\nTransfer from Special Economic Zone - - (15,149) 15,149 - - - - - - - -\n\nre-investment reserve\n\nTransfer to reserves - - - (13) 13 - - - - - - -\n\nSale of shares to non-controlling interests - - - 7 - - - - - 7 21 28\n\nBalance as at March 31, 2025 75 444 1,085 88,777 173 655 9 (24) 3,200 94,394 1,015 95,409\n\nGain of 3368 crore and loss of 388 crore on remeasurement of defined employee benefit plans (net of tax) is recognised as a part of retained earnings for the years ended March 31, 2026 and 2025, respectively.\n\nTotal equity (primarily retained earnings) includes 31,432 crore and 21,570 crore as at March 31, 2026 and 2025, respectivel"
+            }
+        ]
+    },
+    {
+        "id": "tc_009",
+        "question": "How much revenue did TCS earn from Banking, Financial Services and Insurance segment in FY2026?",
+        "expected_answer_contains": "1,03,363 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 19 - Segment information, Year ended March 31, 2026 table, BFSI row",
+        "rationale": "Tests retrieval from a complex multi-column segment table buried in notes.",
+        "source_chunks": [
+            {
+                "qdrant_id": "39dab13e-7abf-5a9e-a99d-ed80fa4c99b0",
+                "chunk_index": 108,
+                "source": "Consolidated.pdf",
+                "text": "the previously granted Injunction and remanding to the district court to re-enter a narrower injunction. The Company filed a\n\npetition for rehearing en banc and a petition for panel rehearing in the appellate court on December 5, 2025, which was denied\n\non December 19, 2025.\n\nOn March 19, 2026, a petition for a writ of certiorari from the US Supreme Court was filed, seeking a review of the case and the\n\nSupreme Court\u2019s decision is awaited.\n\nThe Company, based on consultation with the external lawyers and legal assessment, believes that it has a strong case and would\n\ndefend its position vigorously and pursue legal remedies to overturn the decision of the Fifth Circuit.\n\nConsidering all the f"
+            }
+        ]
+    },
+    {
+        "id": "tc_010",
+        "question": "What was the total revenue from Americas geography in FY2026?",
+        "expected_answer_contains": "1,34,998 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 19 - Segment information, geographical revenue table",
+        "rationale": "Tests retrieval of a geographic breakdown which requires finding the geographical revenue subsection.",
+        "source_chunks": [
+            {
+                "qdrant_id": "39dab13e-7abf-5a9e-a99d-ed80fa4c99b0",
+                "chunk_index": 108,
+                "source": "Consolidated.pdf",
+                "text": "the previously granted Injunction and remanding to the district court to re-enter a narrower injunction. The Company filed a\n\npetition for rehearing en banc and a petition for panel rehearing in the appellate court on December 5, 2025, which was denied\n\non December 19, 2025.\n\nOn March 19, 2026, a petition for a writ of certiorari from the US Supreme Court was filed, seeking a review of the case and the\n\nSupreme Court\u2019s decision is awaited.\n\nThe Company, based on consultation with the external lawyers and legal assessment, believes that it has a strong case and would\n\ndefend its position vigorously and pursue legal remedies to overturn the decision of the Fifth Circuit.\n\nConsidering all the f"
+            }
+        ]
+    },
+    {
+        "id": "tc_011",
+        "question": "What was TCS's profit after tax for FY2026?",
+        "expected_answer_contains": "49,454 crore",
+        "category": "factual",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Profit and Loss - 'Profit for the year'",
+        "rationale": "Basic P&L lookup. Contrasts with 'profit attributable to shareholders' (49,210 crore) to test precision.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_012",
+        "question": "What was the total provision towards exceptional items in TCS's FY2026 P&L?",
+        "expected_answer_contains": "4,526 crore",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Profit and Loss - Exceptional items section (Re-structuring 1,388 + Labour Codes 2,128 + Legal claim 1,010)",
+        "rationale": "The answer 4,526 is not stated explicitly \u2014 the LLM must sum three separately listed exceptional items. Tests arithmetic reasoning over retrieved context.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_013",
+        "question": "Did TCS's profit before tax increase or decrease in FY2026 compared to FY2025, excluding exceptional items?",
+        "expected_answer_contains": "increased",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Consolidated Statement of Profit and Loss - 'Profit before exceptional items and tax': FY26 70,013 vs FY25 65,331",
+        "rationale": "Requires comparing two years' figures for a line not directly asked about. Tests temporal comparison reasoning.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_014",
+        "question": "Was TCS a net buyer or net seller of investments in FY2026?",
+        "expected_answer_contains": "net buyer",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Cash Flow - Investing: Purchase of investments 1,51,864 crore vs Proceeds from disposal 1,48,023 crore",
+        "rationale": "The answer is derived by comparing two cash flow lines (purchase vs proceeds). Tests deductive reasoning on financial data.",
+        "source_chunks": [
+            {
+                "qdrant_id": "bf2a04c4-d114-54cb-b4e7-d7e51707b846",
+                "chunk_index": 6,
+                "source": "Consolidated.pdf",
+                "text": "Dividend - - - (44,864) - - - - - (44,864) (98) (44,962)\n\nTransfer from Special Economic Zone - - (15,149) 15,149 - - - - - - - -\n\nre-investment reserve\n\nTransfer to reserves - - - (13) 13 - - - - - - -\n\nSale of shares to non-controlling interests - - - 7 - - - - - 7 21 28\n\nBalance as at March 31, 2025 75 444 1,085 88,777 173 655 9 (24) 3,200 94,394 1,015 95,409\n\nGain of 3368 crore and loss of 388 crore on remeasurement of defined employee benefit plans (net of tax) is recognised as a part of retained earnings for the years ended March 31, 2026 and 2025, respectively.\n\nTotal equity (primarily retained earnings) includes 31,432 crore and 21,570 crore as at March 31, 2026 and 2025, respectivel"
+            }
+        ]
+    },
+    {
+        "id": "tc_015",
+        "question": "Is TCS significantly exposed to interest rate risk on its investment portfolio?",
+        "expected_answer_contains": "not significantly exposed",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 8(l) - Financial risk management, Interest rate risk subsection",
+        "rationale": "The document states this explicitly but uses hedged language. Tests if the LLM can extract a policy stance from a risk note.",
+        "source_chunks": [
+            {
+                "qdrant_id": "fb343675-00b4-571c-87be-0b019581754b",
+                "chunk_index": 78,
+                "source": "Consolidated.pdf",
+                "text": "transferred to customer typically involving time and material, outcome based and event based contracts.\n\nUnsatisfied (or partially satisfied) performance obligations are subject to variability due to several factors such as terminations, changes\n\nin scope of contracts, periodic revalidations of the estimates, economic factors (changes in currency rates, tax laws etc). The aggregate\n\nvalue of transaction price allocated to unsatisfied (or partially satisfied) performance obligations is \u00a5223,632 crore out of which 43.53%\n\nis expected to be recognised as revenue in the next year and the balance thereafter. No consideration from contracts with customers\n\nis excluded from the amount mentioned abo"
+            }
+        ]
+    },
+    {
+        "id": "tc_016",
+        "question": "Would a 10% appreciation of foreign currencies against functional currency increase or decrease TCS's profit?",
+        "expected_answer_contains": "decrease",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 8(l) - Unhedged foreign currency exposure table showing net liabilities exceeding net assets in USD",
+        "rationale": "The table shows net foreign currency liabilities > assets, implying appreciation hurts. Requires reading table + drawing directional inference.",
+        "source_chunks": [
+            {
+                "qdrant_id": "fb343675-00b4-571c-87be-0b019581754b",
+                "chunk_index": 78,
+                "source": "Consolidated.pdf",
+                "text": "transferred to customer typically involving time and material, outcome based and event based contracts.\n\nUnsatisfied (or partially satisfied) performance obligations are subject to variability due to several factors such as terminations, changes\n\nin scope of contracts, periodic revalidations of the estimates, economic factors (changes in currency rates, tax laws etc). The aggregate\n\nvalue of transaction price allocated to unsatisfied (or partially satisfied) performance obligations is \u00a5223,632 crore out of which 43.53%\n\nis expected to be recognised as revenue in the next year and the balance thereafter. No consideration from contracts with customers\n\nis excluded from the amount mentioned abo"
+            }
+        ]
+    },
+    {
+        "id": "tc_017",
+        "question": "Did TCS's allowance for expected credit losses on trade receivables increase or decrease in FY2026?",
+        "expected_answer_contains": "decreased",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 8(l) - Allowance reconciliation table: Balance end of year 1,285 crore vs beginning 1,304 crore",
+        "rationale": "Requires reading a reconciliation table and comparing opening vs closing balance \u2014 not a simple lookup.",
+        "source_chunks": [
+            {
+                "qdrant_id": "fb343675-00b4-571c-87be-0b019581754b",
+                "chunk_index": 78,
+                "source": "Consolidated.pdf",
+                "text": "transferred to customer typically involving time and material, outcome based and event based contracts.\n\nUnsatisfied (or partially satisfied) performance obligations are subject to variability due to several factors such as terminations, changes\n\nin scope of contracts, periodic revalidations of the estimates, economic factors (changes in currency rates, tax laws etc). The aggregate\n\nvalue of transaction price allocated to unsatisfied (or partially satisfied) performance obligations is \u00a5223,632 crore out of which 43.53%\n\nis expected to be recognised as revenue in the next year and the balance thereafter. No consideration from contracts with customers\n\nis excluded from the amount mentioned abo"
+            }
+        ]
+    },
+    {
+        "id": "tc_018",
+        "question": "Is the goodwill from the Coastal Cloud acquisition tax deductible?",
+        "expected_answer_contains": "not tax deductible",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 7(b) - Acquisition of Coastal Cloud Holdings, LLC: 'The resultant goodwill is non-tax deductible'",
+        "rationale": "A simple factual sentence buried inside a long acquisition note. Tests semantic retrieval with low keyword overlap to the question.",
+        "source_chunks": [
+            {
+                "qdrant_id": "6dc30dc8-cac5-53de-b30d-9af160143218",
+                "chunk_index": 16,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\n\nChanges in the Company\u2019s interests in subsidiaries that do not result in a loss of control are accounted for as equity transactions. The\ncarrying amount of the Company\u2019s interests and the non-controlling interests are adjusted to reflect the changes in their relative interests\nin the subsidiaries. Any difference between the amount by which the non-controlling interests are adjusted and the fair value of the\nconsideration paid or received is recognised directly in equity and attributed to shareholders of the Company.\nAssets and liabilities of entities with functional currency other than the functional c"
+            }
+        ]
+    },
+    {
+        "id": "tc_019",
+        "question": "What would happen to TCS's defined benefit obligations if the discount rate increased by 0.50%?",
+        "expected_answer_contains": "decrease by 382 crore",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 14 - Employee benefits, sensitivity analysis table for discount rate",
+        "rationale": "Requires reading a sensitivity table and picking the right directional row \u2014 tests structured table comprehension.",
+        "source_chunks": [
+            {
+                "qdrant_id": "32efb953-07cb-50d6-a4f5-f187970bc6e0",
+                "chunk_index": 85,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nNotes forming part of consolidated financial statements\n\n(= crore)\n\nAs at March 31, 2026 As at March 31, 2025\n\nDomestic Domestic Foreign Foreign Total Domestic Domestic Foreign Foreign Total\n\nplans plans plans plans plans plans plans plans\n\nFunded Unfunded Funded Unfunded Funded Unfunded Funded Unfunded\n\nFunded status\n\nDeficit of plan assets over (2) (13) (127) (528) (670) (13) (4) (113) (435) (565)\n\nobligations\n\nSurplus of plan assets over 217 - 649 - 866 1,729 - 419 - 2,148\n\nobligations\n\n215 (13) 522 (528) 196 1,716 (4) 306 (435) 1,583\n\n(% crore)\n\nAs at March 31, 2026 As at March 31, 2025\n\nDomestic Domestic Foreign Foreign Total Domestic Domestic Foreign "
+            }
+        ]
+    },
+    {
+        "id": "tc_020",
+        "question": "Are Class B compulsorily convertible preference shares included in TCS's diluted EPS calculation for FY2026?",
+        "expected_answer_contains": "not included",
+        "category": "inferential",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 18 - Earnings per share: 'have not been included in the calculation of diluted earnings per share as they are antidilutive'",
+        "rationale": "Requires understanding what antidilutive means in context. Tests inferential leap from technical accounting term.",
+        "source_chunks": [
+            {
+                "qdrant_id": "b433cfcb-d9df-54c6-a373-3e778ccfba60",
+                "chunk_index": 107,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\ne Other claims\n> Claims aggregating $301 crore and %248 crore as at March 31, 2026 and 2025, respectively, against the Group have not been\n\nacknowledged as debts.\n\n> In April 2019, Computer Sciences Corporation (referred to as CSC) filed a legal claim against the Company in the Court of Northern\n\nDistrict of Texas and Dallas Division (trial court) alleging misappropriation of trade secrets and other CSC\u2019s confidential information\n\nand sought preliminary and permanent injunctive relief, and unspecified monetary damages and disgorgement of profits.\n\nA trial before an advisory jury was held and on November"
+            }
+        ]
+    },
+    {
+        "id": "tc_021",
+        "question": "Why did TCS's total goodwill increase so significantly from FY2025 to FY2026, and which acquisition contributed the most?",
+        "expected_answer_contains": "Coastal Cloud",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: Balance Sheet showing goodwill 9,108 (FY26) vs 1,860 (FY25). Chunk 2: Note 7(b) showing Coastal Cloud goodwill of 6,161 crore",
+        "rationale": "Requires: (1) balance sheet chunk showing the jump, (2) acquisition note chunk explaining the source. Classic two-chunk retrieval.",
+        "source_chunks": [
+            {
+                "qdrant_id": "42ed9c19-6c96-59a8-9f03-7820ca5169d1",
+                "chunk_index": 0,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Balance Sheet\n\n(= crore)\n\nNote As at As at\n\nMarch 31, 2026 March 31, 2025\n\nASSETS\n\nNon-current assets\n\nProperty, plant and equipment 10(a) 11,032 10,978\n\nCapital work-in-progress 10(a) 2,665 1,546\n\nRight-of-use assets 9 11,027 9,275\n\nGoodwill 10(b) 9,108 1,860\n\nOther intangible assets 10(c) 176 940\n\nFinancial assets\n\nInvestments 8(a) 218 275\n\nTrade receivables\n\nBilled 8(b) 99 91\n\nUnbilled 114 33\n\nLoans 8(e) 775 25\n\nOther financial assets 8(f) 2,944 2,731\n\nDeferred tax assets (net) 17 4,465 3,578\n\nIncome tax assets (net) 1,439 1,569\n\nOther assets 10(d) 2,605 3,712\n\nTotal non-current assets 46,667 36,618\n\nCurrent assets\n\nInventories 10(e) 29 21\n\n"
+            },
+            {
+                "qdrant_id": "6dc30dc8-cac5-53de-b30d-9af160143218",
+                "chunk_index": 16,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\n\nChanges in the Company\u2019s interests in subsidiaries that do not result in a loss of control are accounted for as equity transactions. The\ncarrying amount of the Company\u2019s interests and the non-controlling interests are adjusted to reflect the changes in their relative interests\nin the subsidiaries. Any difference between the amount by which the non-controlling interests are adjusted and the fair value of the\nconsideration paid or received is recognised directly in equity and attributed to shareholders of the Company.\nAssets and liabilities of entities with functional currency other than the functional c"
+            }
+        ]
+    },
+    {
+        "id": "tc_022",
+        "question": "What is the total consideration paid for both acquisitions TCS made in FY2026, and what were the companies acquired?",
+        "expected_answer_contains": "ListEngage and Coastal Cloud",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: Note 7(a) ListEngage for 612 crore. Chunk 2: Note 7(b) Coastal Cloud for 6,386 crore. Total: ~6,998 crore",
+        "rationale": "Requires retrieving two separate acquisition notes (7a and 7b) and summing them. Tests multi-chunk aggregation.",
+        "source_chunks": [
+            {
+                "qdrant_id": "ea689eeb-25f7-5f4e-90a9-cd8d015cb965",
+                "chunk_index": 15,
+                "source": "Consolidated.pdf",
+                "text": "4) Basis of consolidation\nThe Company consolidates all entities which are controlled by it.\nThe Company establishes control when; it has power over the entity, is exposed, or has rights, to variable returns from its involvement\nwith the entity and has the ability to affect the entity\u2019s returns by using its power over relevant activities of the entity.\nEntities controlled by the Company are consolidated from the date control commences until the date control ceases.\nThe results of subsidiaries acquired, or sold, during the year are consolidated from the effective date of acquisition and up to the effective\ndate of disposal, as appropriate.\nThe financial statements of the Group companies are co"
+            },
+            {
+                "qdrant_id": "6dc30dc8-cac5-53de-b30d-9af160143218",
+                "chunk_index": 16,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\n\nChanges in the Company\u2019s interests in subsidiaries that do not result in a loss of control are accounted for as equity transactions. The\ncarrying amount of the Company\u2019s interests and the non-controlling interests are adjusted to reflect the changes in their relative interests\nin the subsidiaries. Any difference between the amount by which the non-controlling interests are adjusted and the fair value of the\nconsideration paid or received is recognised directly in equity and attributed to shareholders of the Company.\nAssets and liabilities of entities with functional currency other than the functional c"
+            }
+        ]
+    },
+    {
+        "id": "tc_023",
+        "question": "How did the restructuring announced in July 2025 affect TCS's FY2026 financial statements, and what was the actual cash spent?",
+        "expected_answer_contains": "1,388 crore",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: P&L exceptional items showing restructuring 1,388 crore. Chunk 2: Note 25 explaining 1,268 crore utilized, 120 crore remaining as provision",
+        "rationale": "Requires: (1) P&L chunk for the amount, (2) Note 25 chunk for utilization detail. Tests linking an income statement item to its explanatory note.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            },
+            {
+                "qdrant_id": "0b7c3cf7-95a4-5d58-a377-8cff6628ae4c",
+                "chunk_index": 122,
+                "source": "Consolidated.pdf",
+                "text": "26) On November 21, 2025, the Government of India notified the four Labour Codes - the Code on Wages, 2019, the Industrial Relations\nCode, 2020, the Code on Social Security, 2020, and the Occupational Safety, Health and Working Conditions Code, 2020 - consolidating\n29 existing labour laws. The Ministry of Labour & Employment published draft Central Rules and FAQs to enable assessment of the\nfinancial impact due to changes in regulations. The Group has considered restructured compensation of its employees with effect from\nApril 1, 2026, and assessed the impact of the changes, consistent with the Labour Codes, draft rules, FAQs and legal\nopinion. Considering the materiality and regulatory-driv"
+            }
+        ]
+    },
+    {
+        "id": "tc_024",
+        "question": "What is TCS's exposure to Jaguar Land Rover and what does TCS owe them or vice versa?",
+        "expected_answer_contains": "991 crore",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: Note 22 transactions table showing revenue from JLR 3,572 crore. Chunk 2: Note 22 balances table showing trade receivables from JLR 991 crore",
+        "rationale": "Revenue transactions and outstanding balances are in two separate sub-tables within Note 22. Tests within-note multi-chunk retrieval.",
+        "source_chunks": [
+            {
+                "qdrant_id": "2d25ed1e-aa74-5703-aec2-6e56e763b4cb",
+                "chunk_index": 113,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\n\nNotes:\n\n1. On January 29, 2025, the Share Purchase and Securities Purchase Agreement (SSPA) was executed between Tata Consultancy\nServices Limited (Company), Tata Realty and Infrastructure Limited (TRIL), TRIL Bengaluru Real Estate Five Limited (TBRF) and TRIL\nBengaluru Real Estate Six Limited (TBRS) for acquisition of 100% equity shares and optionally redeemable convertible debentures\nof TBRF and TBRS held by TRIL, in two tranches at a consideration of \u00a31,593 crore.\n\nOn April 30, 2025, the Company paid %554 crore towards consideration for remaining 35% stake in equity shares and optionally\nredeemable "
+            },
+            {
+                "qdrant_id": "bddc82fc-3a32-5b86-90fc-e87f8f92d834",
+                "chunk_index": 114,
+                "source": "Consolidated.pdf",
+                "text": "9. Tata Consultancy Services Asia Pacific Pte. Ltd. incorporated a subsidiary, Tata Consultancy Services BT Private Limited in Bhutan\non December 16, 2025.\n\n10. Trident LE LLC merged with Coastal Cloud Holdings, LLC w.e.f. January 14, 2026.\n\n11. Tata Consultancy Services Netherlands B.V. incorporated a subsidiary, Tata Consultancy Services Regional Headquarters in the\nKingdom of Saudi Arabia on January 18, 2026.\n\n12. Tata Consultancy Services Netherlands B.V. incorporated a subsidiary, Tata Consultancy Services Maroc SARL AU in Morocco on\nJanuary 23, 2026.\n\n13. SCP V-B Blocker III LLC renamed to Coastal Cloud NA LLC w.e.f. February 10, 2026.\n\n57"
+            }
+        ]
+    },
+    {
+        "id": "tc_025",
+        "question": "What new Labour Codes were notified by the Government of India in FY2026 and how did it financially impact TCS?",
+        "expected_answer_contains": "2,128 crore",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: P&L exceptional items - 'Statutory impact of new Labour Codes 2,128 crore'. Chunk 2: Note 26 explaining the four Labour Codes and compensation restructuring",
+        "rationale": "Requires linking the P&L number to the detailed explanatory note. Tests cross-section retrieval between statement and notes.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            },
+            {
+                "qdrant_id": "10e5c6ed-762b-5f93-88f8-5d0cb248e527",
+                "chunk_index": 123,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\n27) Dividends\nDividends paid during the year ended March 31, 2026 include an amount of %30.00 per equity share towards final dividend for the year\nended March 31, 2025 and an amount of 279.00 per equity share towards interim dividends (including special dividend) for the year\nended March 31, 2026. Dividends paid during the year ended March 31, 2025 include an amount of \u00a328.00 per equity share towards\nfinal dividend for the year ended March 31, 2024 and an amount of %96.00 per equity share towards interim dividends (including special\ndividend) for the year ended March 31, 2025.\nDividends declared by the "
+            }
+        ]
+    },
+    {
+        "id": "tc_026",
+        "question": "What is TCS's unsatisfied performance obligation backlog and how much of it is expected to be recognized in the next year?",
+        "expected_answer_contains": "2,23,632 crore",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: Note 12 revenue recognition - 'aggregate value of transaction price allocated to unsatisfied performance obligations is 2,23,632 crore'. Chunk 2: '43.53% expected to be recognised in the next year'",
+        "rationale": "Both pieces of information are in the same note but in different paragraphs. Tests intra-note multi-section retrieval.",
+        "source_chunks": [
+            {
+                "qdrant_id": "060f3703-4c90-53b1-87e7-ae4f0d0fc89d",
+                "chunk_index": 94,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nNotes forming part of consolidated financial statements\n\n17) Income taxes\n\nIncome tax expense comprises current tax expense and the net change in the deferred tax asset or liability during the year. Current\n\nand deferred taxes are recognised in statement of profit and loss, except when they relate to items that are recognised in other\n\ncomprehensive income or directly in equity, in which case, the current and deferred tax are also recognised in other comprehensive\n\nincome or directly in equity, respectively.\n\nCurrent income taxes\n\nThe current income tax expense includes income taxes payable by the Company and its subsidiaries in India and overseas.\n\nThe Hol"
+            }
+        ]
+    },
+    {
+        "id": "tc_027",
+        "question": "What is the current status of the CSC legal claim against TCS, and how much has TCS provisioned for it?",
+        "expected_answer_contains": "1,010 crore",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: P&L exceptional items - 'Provision towards legal claim 1,010 crore'. Chunk 2: Note 20 - detailed narrative about CSC case, Fifth Circuit decision, Supreme Court petition",
+        "rationale": "Requires: (1) the P&L amount, (2) the legal narrative in Note 20. Tests linking numbers to their narrative explanation.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            },
+            {
+                "qdrant_id": "1d8f90fb-a3f3-5550-a1a1-0cf0b02c2616",
+                "chunk_index": 115,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nNotes forming part of consolidated financial statements\n\n22) Related party transactions\n\nThe Company\u2019s principal related parties consist of its holding company Tata Sons Private Limited and its subsidiaries, its own\n\nsubsidiaries, affiliates and key managerial personnel. The Group\u2019s material related party transactions and outstanding balances are\n\nwith related parties with whom the Group routinely enter into transactions in the ordinary course of business.\n\nTransactions and balances with its own subsidiaries are eliminated on consolidation.\n\nTransactions with related parties are as follows:\n\n(= crore)\n\nYear ended March 31, 2026\n\nTata Sons Subsidiaries Assoc"
+            }
+        ]
+    },
+    {
+        "id": "tc_028",
+        "question": "For the Coastal Cloud acquisition, what proforma revenue and net profit would have been reported if the acquisition had happened at the start of FY2026?",
+        "expected_answer_contains": "1,266 crore revenue and 48 crore net profit",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: Note 7(b) proforma results table. Chunk 2: Note 7(b) actual contribution table (270 crore revenue, net loss 13 crore) for contrast",
+        "rationale": "Proforma vs actual contribution are in adjacent sub-sections of Note 7(b). Tests precise sub-section retrieval within a long note.",
+        "source_chunks": [
+            {
+                "qdrant_id": "6dc30dc8-cac5-53de-b30d-9af160143218",
+                "chunk_index": 16,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\n\nChanges in the Company\u2019s interests in subsidiaries that do not result in a loss of control are accounted for as equity transactions. The\ncarrying amount of the Company\u2019s interests and the non-controlling interests are adjusted to reflect the changes in their relative interests\nin the subsidiaries. Any difference between the amount by which the non-controlling interests are adjusted and the fair value of the\nconsideration paid or received is recognised directly in equity and attributed to shareholders of the Company.\nAssets and liabilities of entities with functional currency other than the functional c"
+            }
+        ]
+    },
+    {
+        "id": "tc_029",
+        "question": "What is the total value of TCS's current investments as of March 31, 2026, and what is the single largest component?",
+        "expected_answer_contains": "33,770 crore",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: Balance Sheet - Current financial assets, Investments 33,770. Chunk 2: Note 8(a) Current investments breakdown showing Government bonds 21,451 as largest",
+        "rationale": "Requires balance sheet total + the investment breakdown note. Tests linking a line item to its detailed decomposition note.",
+        "source_chunks": [
+            {
+                "qdrant_id": "42ed9c19-6c96-59a8-9f03-7820ca5169d1",
+                "chunk_index": 0,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Balance Sheet\n\n(= crore)\n\nNote As at As at\n\nMarch 31, 2026 March 31, 2025\n\nASSETS\n\nNon-current assets\n\nProperty, plant and equipment 10(a) 11,032 10,978\n\nCapital work-in-progress 10(a) 2,665 1,546\n\nRight-of-use assets 9 11,027 9,275\n\nGoodwill 10(b) 9,108 1,860\n\nOther intangible assets 10(c) 176 940\n\nFinancial assets\n\nInvestments 8(a) 218 275\n\nTrade receivables\n\nBilled 8(b) 99 91\n\nUnbilled 114 33\n\nLoans 8(e) 775 25\n\nOther financial assets 8(f) 2,944 2,731\n\nDeferred tax assets (net) 17 4,465 3,578\n\nIncome tax assets (net) 1,439 1,569\n\nOther assets 10(d) 2,605 3,712\n\nTotal non-current assets 46,667 36,618\n\nCurrent assets\n\nInventories 10(e) 29 21\n\n"
+            },
+            {
+                "qdrant_id": "c96d6f02-fe84-561d-951e-065fe14c8e40",
+                "chunk_index": 30,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nNotes forming part of consolidated financial statements\n\nThe hedge instruments are designated and documented as hedges at the inception of the contract. The Group determines the existence\n\nof an economic relationship between the hedging instrument and hedged item based on the currency, amount and timing of their\n\nrespective cash flows. The effectiveness of hedge instruments to reduce the risk associated with the exposure being hedged is assessed\n\nand measured at inception and on an ongoing basis. If the hedged future cash flows are no longer expected to occur, then the amounts\n\nthat have been accumulated in other equity are immediately reclassified in net f"
+            }
+        ]
+    },
+    {
+        "id": "tc_030",
+        "question": "What is the relationship between TCS's lease liabilities on the balance sheet and the total contractual cash outflows shown in the liquidity risk note?",
+        "expected_answer_contains": "13,218 crore",
+        "category": "multi_hop",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Chunk 1: Balance Sheet - lease liabilities current 1,830 + non-current 453 = 2,283. Chunk 2: Note 8(l) liquidity table showing total contractual lease outflows 13,218 (includes future interest)",
+        "rationale": "Requires understanding why balance sheet carrying amount differs from contractual cash flows. Tests financial literacy + two-chunk reasoning.",
+        "source_chunks": [
+            {
+                "qdrant_id": "42ed9c19-6c96-59a8-9f03-7820ca5169d1",
+                "chunk_index": 0,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Balance Sheet\n\n(= crore)\n\nNote As at As at\n\nMarch 31, 2026 March 31, 2025\n\nASSETS\n\nNon-current assets\n\nProperty, plant and equipment 10(a) 11,032 10,978\n\nCapital work-in-progress 10(a) 2,665 1,546\n\nRight-of-use assets 9 11,027 9,275\n\nGoodwill 10(b) 9,108 1,860\n\nOther intangible assets 10(c) 176 940\n\nFinancial assets\n\nInvestments 8(a) 218 275\n\nTrade receivables\n\nBilled 8(b) 99 91\n\nUnbilled 114 33\n\nLoans 8(e) 775 25\n\nOther financial assets 8(f) 2,944 2,731\n\nDeferred tax assets (net) 17 4,465 3,578\n\nIncome tax assets (net) 1,439 1,569\n\nOther assets 10(d) 2,605 3,712\n\nTotal non-current assets 46,667 36,618\n\nCurrent assets\n\nInventories 10(e) 29 21\n\n"
+            },
+            {
+                "qdrant_id": "26cd8697-26dd-58e3-9ca9-b4a72f75fb93",
+                "chunk_index": 80,
+                "source": "Consolidated.pdf",
+                "text": "asset ceiling and the return on plan assets (excluding interest), is reflected immediately in the balance sheet with a charge or credit\n\nrecognised in other comprehensive income in the period in which they occur. Past service cost, both vested and unvested, is recognised\n\nas an expense at the earlier of (a) when the plan amendment or curtailment occurs; and (b) when the entity recognises related\n\nrestructuring costs or termination benefits.\n\nThe retirement benefit obligations recognised in the balance sheet represents the present value of the defined benefit obligations\n\nreduced by the fair value of scheme assets. Any asset resulting from this calculation is limited to the present value of a"
+            }
+        ]
+    },
+    {
+        "id": "tc_031",
+        "question": "What is TCS's net profit margin for FY2026?",
+        "expected_answer_contains": "I cannot find an exact net profit margin percentage stated in the document",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Revenue: 2,67,021 crore. Net profit: 49,454 crore. Margin ~18.5% is calculable but not explicitly stated.",
+        "rationale": "Tests absence-of-explicit-information handling. The system should either compute it transparently or state it's derived, not hallucinate a stated figure.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_032",
+        "question": "What is TCS's total employee headcount as of March 31, 2026?",
+        "expected_answer_contains": "not mentioned",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "No headcount figure appears anywhere in the consolidated financial statements.",
+        "rationale": "Classic absence-of-information test. A hallucinating system might invent a headcount. The correct answer is that it's not disclosed in these statements.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_033",
+        "question": "What is TCS's market capitalization as of March 31, 2026?",
+        "expected_answer_contains": "not available in this document",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Share count (361.8 crore shares) is available but market price per share is not disclosed in financial statements.",
+        "rationale": "Market cap requires share price which is not in financial statements. Tests boundary between what can be derived vs what is genuinely absent.",
+        "source_chunks": [
+            {
+                "qdrant_id": "49f15edf-18b5-561d-a938-cb410c4b1c63",
+                "chunk_index": 54,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nNotes forming part of consolidated financial statements\n\n(m) Equity instruments\n\nThe authorised, issued, subscribed and fully paid up share capital consist of the following:\n\n(\u00ae crore)\n\nAs at As at\n\nMarch 31, 2026 March 31, 2025\n\nAuthorised\n\n460,05,00,000 equity shares of %1 each 460 460\n\n(March 31, 2025: 460,05,00,000 equity shares of %1 each)\n\n105,02,50,000 preference shares of %1 each 105 105\n\n(March 31, 2025: 105,02,50,000 preference shares of %1 each)\n\n565 565\n\nIssued, Subscribed and Fully paid up\n\n361,80,87,518 equity shares of %1 each 362 362\n\n(March 31, 2025: 361,80,87,518 equity shares of \u20ac1 each)\n\n362 362\n\nThe Company\u2019s objective for capital manag"
+            }
+        ]
+    },
+    {
+        "id": "tc_034",
+        "question": "List all exceptional items but do NOT include the statutory impact of new Labour Codes.",
+        "expected_answer_contains": "Re-structuring expenses 1,388 crore and Provision towards legal claim 1,010 crore",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "P&L exceptional items section has three items: restructuring 1,388, Labour Codes 2,128, legal claim 1,010",
+        "rationale": "Negative constraint instruction test. Verifies if the LLM adheres to the exclusion instruction and doesn't include Labour Codes 2,128 crore.",
+        "source_chunks": [
+            {
+                "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+                "chunk_index": 2,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+            }
+        ]
+    },
+    {
+        "id": "tc_035",
+        "question": "What was TCS's revenue from operations in FY2026 from its FMCG division?",
+        "expected_answer_contains": "not have an FMCG division",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "TCS segments are BFSI, Manufacturing, Consumer Business, CMT, Life Sciences, Others \u2014 no FMCG segment exists.",
+        "rationale": "Trick question using a plausible-sounding but nonexistent entity. Tests hallucination prevention when query keywords partially match real content.",
+        "source_chunks": [
+            {
+                "qdrant_id": "39dab13e-7abf-5a9e-a99d-ed80fa4c99b0",
+                "chunk_index": 108,
+                "source": "Consolidated.pdf",
+                "text": "the previously granted Injunction and remanding to the district court to re-enter a narrower injunction. The Company filed a\n\npetition for rehearing en banc and a petition for panel rehearing in the appellate court on December 5, 2025, which was denied\n\non December 19, 2025.\n\nOn March 19, 2026, a petition for a writ of certiorari from the US Supreme Court was filed, seeking a review of the case and the\n\nSupreme Court\u2019s decision is awaited.\n\nThe Company, based on consultation with the external lawyers and legal assessment, believes that it has a strong case and would\n\ndefend its position vigorously and pursue legal remedies to overturn the decision of the Fifth Circuit.\n\nConsidering all the f"
+            }
+        ]
+    },
+    {
+        "id": "tc_036",
+        "question": "What is the interest rate TCS charges on inter-corporate deposits placed with Tata Capital?",
+        "expected_answer_contains": "not disclosed",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 8(e) mentions ICD yields fixed interest rate but the exact rate is not specified for Tata Capital deposits.",
+        "rationale": "Partial information trap \u2014 the document confirms ICDs exist and are fixed-rate, but the actual rate is absent. Tests precision of absence detection.",
+        "source_chunks": [
+            {
+                "qdrant_id": "d907346f-dfeb-5d8e-a262-fa583c28e4da",
+                "chunk_index": 33,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\nInvestments \u2014 Current\n(= crore)\nAs at As at\nMarch 31, 2026 March 31, 2025\nInvestments carried at fair value through profit or loss\nMutual fund units (quoted) 4,692 2,903\nInvestments carried at fair value through OCI\nGovernment bonds and securities (quoted) 21,451 23,845\nCorporate bonds and debentures (quoted) 4,709 3,929\nInvestments carried at amortised cost\nCorporate bonds (quoted) 64 12\nCertificate of deposits (quoted) 1,790 -\nCommercial papers (quoted) 1,064 -\n770 30,689\nInvestments \u2014 Current includes \u00a3279 crore and %79 crore as at March 31, 2026 and 2025, respectively, pertaining to trusts and TCS\nF"
+            }
+        ]
+    },
+    {
+        "id": "tc_037",
+        "question": "What was the revenue from TCS's 'Others' segment in FY2026 and was it profitable?",
+        "expected_answer_contains": "27,393 crore revenue",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 19 segment table shows Others revenue 27,393 and segment result 6,269. BUT segment margin % is not stated.",
+        "rationale": "The question has two parts \u2014 revenue (answerable) and profitability (partially answerable from segment result but margin % unavailable). Tests partial answer handling.",
+        "source_chunks": [
+            {
+                "qdrant_id": "39dab13e-7abf-5a9e-a99d-ed80fa4c99b0",
+                "chunk_index": 108,
+                "source": "Consolidated.pdf",
+                "text": "the previously granted Injunction and remanding to the district court to re-enter a narrower injunction. The Company filed a\n\npetition for rehearing en banc and a petition for panel rehearing in the appellate court on December 5, 2025, which was denied\n\non December 19, 2025.\n\nOn March 19, 2026, a petition for a writ of certiorari from the US Supreme Court was filed, seeking a review of the case and the\n\nSupreme Court\u2019s decision is awaited.\n\nThe Company, based on consultation with the external lawyers and legal assessment, believes that it has a strong case and would\n\ndefend its position vigorously and pursue legal remedies to overturn the decision of the Fifth Circuit.\n\nConsidering all the f"
+            }
+        ]
+    },
+    {
+        "id": "tc_038",
+        "question": "Does TCS have any variable-rate debt that exposes it to interest rate fluctuation risk?",
+        "expected_answer_contains": "not significantly exposed to interest rate risk",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 8(l) states 'The Group's investments are primarily in fixed rate interest bearing investments. Hence, the Group is not significantly exposed to interest rate risk.'",
+        "rationale": "Counter-intuitive result for a large company \u2014 tests if the system surfaces the actual stated policy rather than assuming standard corporate debt exposure.",
+        "source_chunks": [
+            {
+                "qdrant_id": "fb343675-00b4-571c-87be-0b019581754b",
+                "chunk_index": 78,
+                "source": "Consolidated.pdf",
+                "text": "transferred to customer typically involving time and material, outcome based and event based contracts.\n\nUnsatisfied (or partially satisfied) performance obligations are subject to variability due to several factors such as terminations, changes\n\nin scope of contracts, periodic revalidations of the estimates, economic factors (changes in currency rates, tax laws etc). The aggregate\n\nvalue of transaction price allocated to unsatisfied (or partially satisfied) performance obligations is \u00a5223,632 crore out of which 43.53%\n\nis expected to be recognised as revenue in the next year and the balance thereafter. No consideration from contracts with customers\n\nis excluded from the amount mentioned abo"
+            }
+        ]
+    },
+    {
+        "id": "tc_039",
+        "question": "What is TCS's revenue from the Consumer Business segment, and how does this compare to the company's IT services consulting revenue breakdown?",
+        "expected_answer_contains": "42,432 crore",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 19: Consumer Business revenue 42,432. Note 12: Revenue by nature - Consultancy services 2,62,688. These are different cuts of revenue.",
+        "rationale": "Keyword overlap trap \u2014 'Consumer' and 'Consultancy' both appear in separate contexts. Tests disambiguation when question conflates two classification systems.",
+        "source_chunks": [
+            {
+                "qdrant_id": "39dab13e-7abf-5a9e-a99d-ed80fa4c99b0",
+                "chunk_index": 108,
+                "source": "Consolidated.pdf",
+                "text": "the previously granted Injunction and remanding to the district court to re-enter a narrower injunction. The Company filed a\n\npetition for rehearing en banc and a petition for panel rehearing in the appellate court on December 5, 2025, which was denied\n\non December 19, 2025.\n\nOn March 19, 2026, a petition for a writ of certiorari from the US Supreme Court was filed, seeking a review of the case and the\n\nSupreme Court\u2019s decision is awaited.\n\nThe Company, based on consultation with the external lawyers and legal assessment, believes that it has a strong case and would\n\ndefend its position vigorously and pursue legal remedies to overturn the decision of the Fifth Circuit.\n\nConsidering all the f"
+            },
+            {
+                "qdrant_id": "060f3703-4c90-53b1-87e7-ae4f0d0fc89d",
+                "chunk_index": 94,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nNotes forming part of consolidated financial statements\n\n17) Income taxes\n\nIncome tax expense comprises current tax expense and the net change in the deferred tax asset or liability during the year. Current\n\nand deferred taxes are recognised in statement of profit and loss, except when they relate to items that are recognised in other\n\ncomprehensive income or directly in equity, in which case, the current and deferred tax are also recognised in other comprehensive\n\nincome or directly in equity, respectively.\n\nCurrent income taxes\n\nThe current income tax expense includes income taxes payable by the Company and its subsidiaries in India and overseas.\n\nThe Hol"
+            }
+        ]
+    },
+    {
+        "id": "tc_040",
+        "question": "What dividend per share did TCS declare for FY2026 including both interim and final?",
+        "expected_answer_contains": "110 per share",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf",
+        "source_chunk_hint": "Note 27: Interim dividends (including special) 79/share + proposed final 31/share = 110. But the final is proposed, not yet paid.",
+        "rationale": "Requires summing interim paid (79) + proposed final (31) while noting the final is subject to shareholder approval. Tests nuanced multi-condition aggregation.",
+        "source_chunks": [
+            {
+                "qdrant_id": "11189975-aae9-57ad-961e-780c46b635dd",
+                "chunk_index": 118,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\nNotes forming part of consolidated financial statements\nMaterial related party transactions are as follows:\n(= crore)\nYear ended Year ended\nMarch 31, 2026 March 31, 2025\nRevenue from operations\nJaguar Land Rover Limited 3,572 3,661\nTata Steel IJmuiden BV 717 429\nPurchases of goods and services (including reimbursements)\nTejas Networks Limited 26 7,508\nTata Communications (UK) Limited 1,219 -\nAdvances given\nTejas Networks Limited - -\nContribution and advance to post employment benefit plans\nTata Consultancy Services Employees' Provident Fund 2,673 3,870\nInter-corporate deposits placed\nTata Capital Limited 1,000\nAcquisition of assets\nTata Realty and Infrastruc"
+            }
+        ]
+    },
+    {
+        "id": "tc_041",
+        "question": "What is the JJM project and which government ministry oversees it?",
+        "expected_answer_contains": "Jal Jeevan Mission",
+        "category": "factual",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "Introduction/overview section of JJM document",
+        "rationale": "Basic factual lookup about JJM identity and governance. Tests BM25 keyword retrieval on government scheme name.",
+        "source_chunks": [
+            {
+                "qdrant_id": "a7559bf4-4988-5506-ad3e-29b7a1950ce0",
+                "chunk_index": 0,
+                "source": "jjm.pdf",
+                "text": "Go v ernment of India Minis tr y of Jal Shakti Depar tment of Drinking W at er and Sanit ation N ational Jal Jee van Mission N ew Delhi 1 1 0 003 December , 20 1 9 OPERA TION AL GUIDELINES F OR THE IMPLEMENT A TION OF J AL JEEV AN MISSION Har Ghar Jal"
+            }
+        ]
+    },
+    {
+        "id": "tc_042",
+        "question": "What is the target of the Jal Jeevan Mission in terms of household tap water connections?",
+        "expected_answer_contains": "every rural household",
+        "category": "factual",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "JJM mission objectives section",
+        "rationale": "Tests retrieval of the scheme's primary stated goal \u2014 a core factual anchor for the entire document.",
+        "source_chunks": [
+            {
+                "qdrant_id": "26321b62-2d10-507b-b498-e9c5cbc012b6",
+                "chunk_index": 51,
+                "source": "jjm.pdf",
+                "text": "3.3 Objectiv es The br oad objectiv es of the Mission ar e: i.) t o pr ovide FHT C t o e v ery rur al household; ii.) to p r i o r i t i z e p ro v i s i o n o f F H T C s i n q u a l i t y - a f f ect ed ar eas, villag es in dr ough t pr one and d e s e r t a r e a s , S a n s a d A d a rs h G ra m Y o j a n a (S A G Y) villag es, e t c.; i i i\n\n) t o p r o v i d e f u n c t i o n a l t a p c o n n e c t i o n t o S c h o o l s , A n g a n w a d i c e n t r e s , G P b u i l d i n g s , H e a l t h c e n t r e s , w e l l n e s s c e n t r e s a n d c o m m u n i t y b u i l d i n g s ; iv .) t o monit or functionality of t ap c onnections; v .) t o pr omot e and ensur e v olun t ary owner "
+            }
+        ]
+    },
+    {
+        "id": "tc_043",
+        "question": "What does FHTC stand for in the context of JJM?",
+        "expected_answer_contains": "Functional Household Tap Connection",
+        "category": "factual",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "JJM definitions or key metrics section where FHTC is first introduced",
+        "rationale": "Acronym expansion test. Acronyms are common retrieval failures \u2014 tests if the chunk containing the definition is properly indexed.",
+        "source_chunks": [
+            {
+                "qdrant_id": "19c1cefb-734b-53a3-8b20-0dc96ff7341d",
+                "chunk_index": 116,
+                "source": "jjm.pdf",
+                "text": "36 al Jee v an Mission is a time-bound mission-mode J pr ogr amme t o ensur e e v ery rur al household has a Functional Household T ap Connection (FHT C) by 2024 t o pr ovide drinking w a t er in adequa t e quan tity (minimum 55 lpcd) of pr escribed quality (BIS:10500) on r egular basis\n\nFHT C ma y be planned t o be pr ovided in e v ery household with thr ee deliv ery poin ts (t aps), viz\n\nkit chen, w ashing & ba thing ar ea and t oile t, t o k eep w a t er clean and pr e v en t misuse\n\nOut of the thr ee, only one t ap per household will be funded under JJM\n\nIn this r eg ar d, St a t e Gov ernmen ts/ UT Adminis tr a tion will implemen t the mission based on the finaliz ed St a t e Action Pla"
+            }
+        ]
+    },
+    {
+        "id": "tc_044",
+        "question": "What is the prescribed water supply norm per person per day under JJM?",
+        "expected_answer_contains": "55 litres per capita per day",
+        "category": "factual",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "Technical standards or service level benchmarks section of JJM document",
+        "rationale": "Specific technical standard test \u2014 a number that could easily be confused with other water-related figures in the document.",
+        "source_chunks": [
+            {
+                "qdrant_id": "19c1cefb-734b-53a3-8b20-0dc96ff7341d",
+                "chunk_index": 116,
+                "source": "jjm.pdf",
+                "text": "36 al Jee v an Mission is a time-bound mission-mode J pr ogr amme t o ensur e e v ery rur al household has a Functional Household T ap Connection (FHT C) by 2024 t o pr ovide drinking w a t er in adequa t e quan tity (minimum 55 lpcd) of pr escribed quality (BIS:10500) on r egular basis\n\nFHT C ma y be planned t o be pr ovided in e v ery household with thr ee deliv ery poin ts (t aps), viz\n\nkit chen, w ashing & ba thing ar ea and t oile t, t o k eep w a t er clean and pr e v en t misuse\n\nOut of the thr ee, only one t ap per household will be funded under JJM\n\nIn this r eg ar d, St a t e Gov ernmen ts/ UT Adminis tr a tion will implemen t the mission based on the finaliz ed St a t e Action Pla"
+            }
+        ]
+    },
+    {
+        "id": "tc_045",
+        "question": "What is the funding pattern between the Centre and States for JJM in general category states?",
+        "expected_answer_contains": "90:10",
+        "category": "factual",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "Fund sharing pattern or financing section of JJM document",
+        "rationale": "Tests retrieval of a specific ratio from a policy funding section. Different ratios apply to different state categories creating potential confusion.",
+        "source_chunks": [
+            {
+                "qdrant_id": "5b1bb4de-d306-53fc-b5d9-f68a2c3ba38a",
+                "chunk_index": 145,
+                "source": "jjm.pdf",
+                "text": "46 Se v er al sub-c omponen ts/ sub-missions tha t w er e part of er s twhile NRD WP will also be funded along with Functional Household T ap Connection (FHT C) as per f ollowing de t ails: Cen tr e: St a t e funding pa t t ern Sub-c omponen ts/ sub-missions under JJM S\n\nNo\n\n1\n\ni.) Cov er ag e i.e., in fr as tructur e f or Har Ghar Jal (in t erms of FHT Cs pr ovided t o rur al households) ii.) Support Activities iii.) W QM&S \u0178 100:0 f or UT s without legisla tur e \u0178 90:10 f or NE & Himala y an St a t es & UT s with legisla tur e \u0178 50:50 f or other St a t es \u0178 100:0 f or UT s without legisla tur e \u0178 90:10 f or NE & Himala y an St a t es & UT s with legisla tur e \u0178 60:40 f or other St a t es 2"
+            }
+        ]
+    },
+    {
+        "id": "tc_046",
+        "question": "If a village water supply scheme is completed but the water quality fails to meet standards, should it still be counted as an FHTC?",
+        "expected_answer_contains": "should not",
+        "category": "inferential",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "JJM definition of FHTC which includes quality/quantity/regularity criteria",
+        "rationale": "FHTC definition includes multiple conditions. The answer is derivable from the definition criteria \u2014 tests logical deduction from a definition.",
+        "source_chunks": [
+            {
+                "qdrant_id": "19c1cefb-734b-53a3-8b20-0dc96ff7341d",
+                "chunk_index": 116,
+                "source": "jjm.pdf",
+                "text": "36 al Jee v an Mission is a time-bound mission-mode J pr ogr amme t o ensur e e v ery rur al household has a Functional Household T ap Connection (FHT C) by 2024 t o pr ovide drinking w a t er in adequa t e quan tity (minimum 55 lpcd) of pr escribed quality (BIS:10500) on r egular basis\n\nFHT C ma y be planned t o be pr ovided in e v ery household with thr ee deliv ery poin ts (t aps), viz\n\nkit chen, w ashing & ba thing ar ea and t oile t, t o k eep w a t er clean and pr e v en t misuse\n\nOut of the thr ee, only one t ap per household will be funded under JJM\n\nIn this r eg ar d, St a t e Gov ernmen ts/ UT Adminis tr a tion will implemen t the mission based on the finaliz ed St a t e Action Pla"
+            }
+        ]
+    },
+    {
+        "id": "tc_047",
+        "question": "Would a household that receives water only during monsoon months qualify for an FHTC under JJM guidelines?",
+        "expected_answer_contains": "would not qualify",
+        "category": "inferential",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "FHTC definition requiring regular/year-round supply",
+        "rationale": "Seasonal irregularity inference from the regularity criterion in FHTC definition. The word 'monsoon' does not appear in source but the answer is deducible.",
+        "source_chunks": [
+            {
+                "qdrant_id": "19c1cefb-734b-53a3-8b20-0dc96ff7341d",
+                "chunk_index": 116,
+                "source": "jjm.pdf",
+                "text": "36 al Jee v an Mission is a time-bound mission-mode J pr ogr amme t o ensur e e v ery rur al household has a Functional Household T ap Connection (FHT C) by 2024 t o pr ovide drinking w a t er in adequa t e quan tity (minimum 55 lpcd) of pr escribed quality (BIS:10500) on r egular basis\n\nFHT C ma y be planned t o be pr ovided in e v ery household with thr ee deliv ery poin ts (t aps), viz\n\nkit chen, w ashing & ba thing ar ea and t oile t, t o k eep w a t er clean and pr e v en t misuse\n\nOut of the thr ee, only one t ap per household will be funded under JJM\n\nIn this r eg ar d, St a t e Gov ernmen ts/ UT Adminis tr a tion will implemen t the mission based on the finaliz ed St a t e Action Pla"
+            }
+        ]
+    },
+    {
+        "id": "tc_048",
+        "question": "Which states have shown the highest JJM implementation progress, and what does that imply about implementation capacity?",
+        "expected_answer_contains": "higher administrative capacity",
+        "category": "inferential",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "State-wise progress table or section in JJM document",
+        "rationale": "Requires reading a progress table and drawing an administrative inference. Tests LLM's ability to make a policy-level inference from data.",
+        "source_chunks": [
+            {
+                "qdrant_id": "6cb68c1b-b168-555b-b4bb-7101a4f6b3fe",
+                "chunk_index": 149,
+                "source": "jjm.pdf",
+                "text": "Supplemen t a tion is t o be a v oided in such schemes fr om JJM fund\n\n7.6 R e w ar ding perf ormance J J M b e i n g t i m e - b o u n d c o u n t r y- w i d e p r o g ra m m e , a d d i t i o n a l f u n d w i l l b e m a d e av a i l a b l e t o b e t t e r p e r fo r m i n g S t a t e s / U T s t o i n c e n t i v i ze t h e i r g o o d p e r f o r m a n c e o u t o f t h e f u n d u n c l a i m e d by o t h e r St a t es/ UT s a t the f ag end of the financial y ear , in pr oportion t o their annual alloc a tion\n\nThe deciding par ame t er s f or assessing perf ormance of St a t es/ UT s will be issued by Departmen t/ Na tional Mission\n\nF or a v ailing this fund, it is import an t tha t "
+            }
+        ]
+    },
+    {
+        "id": "tc_049",
+        "question": "How does the JJM financing structure for NE and Himalayan states differ from general states, and what policy rationale might explain this?",
+        "expected_answer_contains": "90:10",
+        "category": "multi_hop",
+        "source_document": "jjm.pdf",
+        "source_chunk_hint": "Chunk 1: Fund sharing table with NE/Himalayan ratio. Chunk 2: JJM stated rationale for special category states",
+        "rationale": "Requires retrieving two chunks: the funding ratio for special states AND a policy justification section. Tests multi-chunk inference.",
+        "source_chunks": [
+            {
+                "qdrant_id": "5b1bb4de-d306-53fc-b5d9-f68a2c3ba38a",
+                "chunk_index": 145,
+                "source": "jjm.pdf",
+                "text": "46 Se v er al sub-c omponen ts/ sub-missions tha t w er e part of er s twhile NRD WP will also be funded along with Functional Household T ap Connection (FHT C) as per f ollowing de t ails: Cen tr e: St a t e funding pa t t ern Sub-c omponen ts/ sub-missions under JJM S\n\nNo\n\n1\n\ni.) Cov er ag e i.e., in fr as tructur e f or Har Ghar Jal (in t erms of FHT Cs pr ovided t o rur al households) ii.) Support Activities iii.) W QM&S \u0178 100:0 f or UT s without legisla tur e \u0178 90:10 f or NE & Himala y an St a t es & UT s with legisla tur e \u0178 50:50 f or other St a t es \u0178 100:0 f or UT s without legisla tur e \u0178 90:10 f or NE & Himala y an St a t es & UT s with legisla tur e \u0178 60:40 f or other St a t es 2"
+            },
+            {
+                "qdrant_id": "31687852-b6d9-5ce0-b994-35cdf455a042",
+                "chunk_index": 50,
+                "source": "jjm.pdf",
+                "text": "1 4 3.1 Vision E v ery rur al household has drinking w a t er supply in adequa t e quan tity of pr escribed quality on r egular and long-t erm basis a t af f or dable ser vice deliv er y char g es leading t o impr ov emen t in living s t andar ds of rur al c ommunities\n\n3.2 Mission Jal Jee v an Mission is t o assis t, empow er and f acilit a t e: i.) St a t es/ UT s in planning of participa t ory rur al wate r s u p p l y st r ate g y f o r e n s u r i n g p o ta b l e drinking w a t er security on long-t erm basis t o e v ery rur al household and public ins titution, viz\n\nGP building , School, Ang an w adi cen tr e, Health cen tr e, w ellness cen tr es, e t c.; ii.) S t a t e s / U T s f o "
+            }
+        ]
+    },
+    {
+        "id": "tc_050",
+        "question": "Considering TCS is a major IT vendor, could TCS potentially be involved in implementing the JJM monitoring or data systems, and what financial scale would that represent relative to TCS's total revenue?",
+        "expected_answer_contains": "not mentioned in either document",
+        "category": "hard_edge",
+        "source_document": "Consolidated.pdf + jjm.pdf",
+        "source_chunk_hint": "Neither document links TCS specifically to JJM implementation contracts.",
+        "rationale": "Cross-document hallucination trap. Plausible inference (TCS does government IT) but neither document supports it. Tests cross-document boundary hallucination prevention.",
+        "source_chunks": [
+            {
+                "qdrant_id": "a7559bf4-4988-5506-ad3e-29b7a1950ce0",
+                "chunk_index": 0,
+                "source": "jjm.pdf",
+                "text": "Go v ernment of India Minis tr y of Jal Shakti Depar tment of Drinking W at er and Sanit ation N ational Jal Jee van Mission N ew Delhi 1 1 0 003 December , 20 1 9 OPERA TION AL GUIDELINES F OR THE IMPLEMENT A TION OF J AL JEEV AN MISSION Har Ghar Jal"
+            },
+            {
+                "qdrant_id": "42ed9c19-6c96-59a8-9f03-7820ca5169d1",
+                "chunk_index": 0,
+                "source": "Consolidated.pdf",
+                "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Balance Sheet\n\n(= crore)\n\nNote As at As at\n\nMarch 31, 2026 March 31, 2025\n\nASSETS\n\nNon-current assets\n\nProperty, plant and equipment 10(a) 11,032 10,978\n\nCapital work-in-progress 10(a) 2,665 1,546\n\nRight-of-use assets 9 11,027 9,275\n\nGoodwill 10(b) 9,108 1,860\n\nOther intangible assets 10(c) 176 940\n\nFinancial assets\n\nInvestments 8(a) 218 275\n\nTrade receivables\n\nBilled 8(b) 99 91\n\nUnbilled 114 33\n\nLoans 8(e) 775 25\n\nOther financial assets 8(f) 2,944 2,731\n\nDeferred tax assets (net) 17 4,465 3,578\n\nIncome tax assets (net) 1,439 1,569\n\nOther assets 10(d) 2,605 3,712\n\nTotal non-current assets 46,667 36,618\n\nCurrent assets\n\nInventories 10(e) 29 21\n\n"
+            }
+        ]
+    }
+]
