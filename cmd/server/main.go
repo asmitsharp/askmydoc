@@ -112,7 +112,7 @@ func main() {
 		Addr:         ":" + cfg.Port,
 		Handler:      handler.Routes(),
 		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 60 * time.Second,
+		WriteTimeout: 5 * time.Minute,
 		IdleTimeout:  120 * time.Second,
 	}
 

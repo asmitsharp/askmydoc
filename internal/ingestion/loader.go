@@ -55,7 +55,17 @@ func (r *Router) Load(path string) (*Document, error) {
 
 	for _, loader := range r.loaders {
 		if loader.Supports(ext) {
-			return loader.Load(path)
+			doc, err := loader.Load(path)
+			if err != nil {
+				return nil, err
+			}
+			if doc != nil {
+				doc.Content = strings.ReplaceAll(doc.Content, "\x00", "")
+				for i := range doc.Pages {
+					doc.Pages[i].Content = strings.ReplaceAll(doc.Pages[i].Content, "\x00", "")
+				}
+			}
+			return doc, nil
 		}
 	}
 
