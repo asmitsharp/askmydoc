@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-04-23T20:22:41+05:30",
+  "total_queries": 2,
+  "context_recall_score": 1,
+  "correctness_score": 1,
+  "faithfulness_score": 1,
+  "latency_stats": {
+    "retrieval_avg_ms": 3283,
+    "retrieval_p50_ms": 952,
+    "retrieval_p95_ms": 952,
+    "generation_avg_ms": 392,
+    "generation_p50_ms": 267,
+    "generation_p95_ms": 267,
+    "total_avg_ms": 3676,
+    "total_p50_ms": 1220,
+    "total_p95_ms": 1220
+  },
+  "passed_thresholds": true,
+  "results": [
+    {
+      "id": "tc_001",
+      "question": "What was TCS's total revenue from operations for the year ended March 31, 2026?",
+      "category": "factual",
+      "context_recall": 1,
+      "answer_correctness": 1,
+      "faithfulness": 1,
+      "retrieval_latency_ms": 5615,
+      "generation_latency_ms": 517,
+      "total_latency_ms": 6132,
+      "actual_answer": "TCS's total revenue from operations for the year ended March 31, 2026 was ₹2,67,021 crore [Source: Consolidated.pdf, Chunk 3].",
+      "retrieved_sources": [
+        "Consolidated.pdf"
+      ],
+      "pass": true
+    },
+    {
+      "id": "tc_002",
+      "question": "What is the basic and diluted earnings per equity share for FY2026?",
+      "category": "factual",
+      "context_recall": 1,
+      "answer_correctness": 1,
+      "faithfulness": 1,
+      "retrieval_latency_ms": 952,
+      "generation_latency_ms": 267,
+      "total_latency_ms": 1220,
+      "actual_answer": "The basic and diluted earnings per equity share for FY2026 is 136.01 [Source: Consolidated.pdf, Chunk 4].",
+      "retrieved_sources": [
+        "Consolidated.pdf"
+      ],
+      "pass": true
+    }
+  ]
+}

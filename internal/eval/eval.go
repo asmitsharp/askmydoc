@@ -193,15 +193,9 @@ func (r *Runner) evaluateTestCase(ctx context.Context, tc GoldenTestCase) TestRe
 	}
 
 	// --- Score: Faithfulness (LLM-as-Judge) ---
-	const maxChunkTokensForJudge = 200
-
 	chunks := make([]string, len(citations))
 	for i, c := range citations {
-		text := c.Content
-		if len(text) > maxChunkTokensForJudge*4 {
-			text = text[:maxChunkTokensForJudge*4] + "..."
-		}
-		chunks[i] = text
+		chunks[i] = c.Content
 	}
 
 	log.Printf("[DEBUG] Starting judge evaluation for %s...", tc.ID)

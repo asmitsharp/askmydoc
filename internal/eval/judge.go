@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/ashmitsharp/askmydocs/internal/llm"
@@ -33,6 +34,8 @@ func (j *Judge) Evaluate(ctx context.Context, answer string, chunks []string) (f
 		return 0, fmt.Errorf("judge LLM call failed: %w", err)
 	}
 
+	log.Printf("[DEBUG] Raw Judge Response: %s", response)
+
 	score, err := parseJudgeResponse(response)
 	if err != nil {
 		return 0, fmt.Errorf("failed to parse judge response: %w", err)
@@ -52,11 +55,7 @@ Your task: Determine if the ANSWER is fully supported by the CONTEXT provided.
 `)
 
 	for i, chunk := range chunks {
-		truncated := chunk
-		if len(chunk) > 800 {
-			truncated = chunk[:800] + "..."
-		}
-		fmt.Fprintf(&sb, "--- Chunk %d ---\n%s\n\n", i+1, truncated)
+		fmt.Fprintf(&sb, "--- Chunk %d ---\n%s\n\n", i+1, chunk)
 	}
 
 	sb.WriteString("## ANSWER TO EVALUATE:\n")
@@ -64,13 +63,12 @@ Your task: Determine if the ANSWER is fully supported by the CONTEXT provided.
 	sb.WriteString(`
 
 ## INSTRUCTIONS:
-1. Break the answer into individual claims/statements.
-2. For each claim, check if it is directly supported by the context above.
-3. A claim about something NOT being in the documents is valid only if
-   the context genuinely does not contain that information.
-4. Ignore citation formatting — focus only on factual content.
+1. Break the answer into individual factual claims.
+2. For each factual claim, check if it is directly supported by the context above.
+3. A claim about something NOT being in the documents is valid only if the context genuinely does not contain that information.
+4. EXPLICITLY IGNORE any citations like "[Source: ...]" or "[Chunk ...]". Do NOT treat citations as claims to be verified. Only evaluate the factual statements in the answer.
 
-Reply with ONLY a JSON object in this exact format:
+Reply with ONLY a JSON object in this exact format, with no other text:
 {"score": <float between 0.0 and 1.0>, "reason": "<brief explanation>"}
 
 Where score = (number of supported claims) / (total claims).

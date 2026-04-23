@@ -25,7 +25,7 @@ func NewGroqLLM(apiKey, model string) *GroqLLM {
 	config.BaseURL = "https://api.groq.com/openai/v1"
 
 	if model == "" {
-		model = "llama-3.3-70b-versatile"
+		model = "meta-llama/llama-4-scout-17b-16e-instruct"
 	}
 
 	return &GroqLLM{

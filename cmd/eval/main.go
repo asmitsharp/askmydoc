@@ -104,7 +104,7 @@ func main() {
 		llmClient = client
 		judgeLLM = client
 	} else if strings.EqualFold(cfg.LLMProvider, "groq") {
-		llmClient = llm.NewGroqLLM(cfg.GroqApiKey, "llama-3.3-70b-versatile")
+		llmClient = llm.NewGroqLLM(cfg.GroqApiKey, "meta-llama/llama-4-scout-17b-16e-instruct")
 		judgeLLM = llm.NewGroqLLM(cfg.GroqApiKey, "llama-3.1-8b-instant")
 	} else {
 		client := llm.NewOpenAIClient(cfg.OpenAIApiKey)

@@ -1,0 +1,36 @@
+[
+  {
+    "id": "tc_001",
+    "question": "What was TCS's total revenue from operations for the year ended March 31, 2026?",
+    "expected_answer_contains": "2,67,021 crore",
+    "category": "factual",
+    "source_document": "Consolidated.pdf",
+    "source_chunk_hint": "Consolidated Statement of Profit and Loss - Revenue from operations line",
+    "rationale": "Direct single-value lookup from P&L. Tests basic BM25 keyword match on 'revenue from operations'.",
+    "source_chunks": [
+      {
+        "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+        "chunk_index": 2,
+        "source": "Consolidated.pdf",
+        "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+      }
+    ]
+  },
+  {
+    "id": "tc_002",
+    "question": "What is the basic and diluted earnings per equity share for FY2026?",
+    "expected_answer_contains": "136.01",
+    "category": "factual",
+    "source_document": "Consolidated.pdf",
+    "source_chunk_hint": "Consolidated Statement of Profit and Loss - EPS section at bottom",
+    "rationale": "Tests retrieval of a specific metric buried at the bottom of the P&L statement.",
+    "source_chunks": [
+      {
+        "qdrant_id": "48705dbf-0b3c-5776-b249-72ae81b0ad54",
+        "chunk_index": 2,
+        "source": "Consolidated.pdf",
+        "text": "TATA CONSULTANCY SERVICES LIMITED\n\nConsolidated Statement of Profit and Loss\n\n(= crore)\n\nNote Year ended Year ended\n\nMarch 31, 2026 March 31, 2025\n\nRevenue from operations 12 2,67,021 2,55,324\n\nOther income 13 4,402 3,962\n\nTOTAL INCOME 2,71,423 2,59,286\n\nExpenses\n\nEmployee benefit expenses 14 1,54,994 1,45,788\n\nCost of equipment and software licences 15(a) 4,399 11,648\n\nFinance costs 16 1,227 796\n\nDepreciation and amortisation expense 5,560 5,242\n\nOther expenses 15(b) 35,230 30,481\n\nTOTAL EXPENSES 2,01,410 1,93,955\n\nPROFIT BEFORE EXCEPTIONAL ITEMS AND TAX 70,013 65,331\n\nExceptional items\n\nRe-structuring expenses 25 1,388 -\n\nStatutory impact of new Labour Codes 26 2,128 -\n\nProvision towards l"
+      }
+    ]
+  }
+]
