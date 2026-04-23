@@ -268,9 +268,38 @@ Multipart form upload. Field name: `file`.
 
 ---
 
+## Evaluation Pipeline
+
+To ensure the RAG system performs reliably, AskMyDocs includes a fully automated evaluation pipeline that runs against a "golden dataset" of Q/A pairs. This pipeline measures three critical metrics:
+- **Context Recall:** Did we retrieve the correct source document?
+- **Answer Correctness:** Does the generated answer contain the expected core facts?
+- **Faithfulness (LLM-as-a-Judge):** Is the answer fully supported by the retrieved context chunks, without any hallucinations?
+
+### Running the Evaluation
+
+The evaluation harness reads the golden dataset, runs each query through the full pipeline, and generates a detailed report.
+
+```bash
+# Run the evaluation pipeline
+go run cmd/eval/main.go -dataset testdata/golden_set.json
+```
+
+This will output a terminal summary and write the detailed query-by-query results to `eval_results.json`.
+
+### The Dual-Model Architecture
+
+The evaluation pipeline is built to use a dual-model architecture. For example, when using Groq as the LLM provider, we configure it as follows:
+- **Generation Model:** `meta-llama/llama-4-scout-17b-16e-instruct` (or similar)
+- **Judge Model:** `llama-3.1-8b-instant`
+
+**Why use two different models, and why is the judge smaller?**
+1. **Token Limits & Cost:** Evaluating an entire dataset of 50+ queries consumes a massive amount of tokens. Running both generation and evaluation on a massive 70B+ model would quickly exhaust daily free-tier API limits (e.g., 100k tokens/day).
+2. **Task Complexity:** The generation model has the heavy lifting—it must synthesize an answer, perform multi-hop reasoning, and structure citations. The **Judge model**, however, only has a focused validation task: verify if the generated answer is factually supported by the provided text chunks. It does not need vast world knowledge or external context. Even on "hard-edge" inferential queries where the answer isn't explicitly stated, the judge only needs to confirm if the generated inference logically maps back to the provided chunks. A smaller, lightning-fast 8B parameter model is highly effective for this strict verification task.
+
+---
+
 ## What's next
 
-- Eval pipeline — ground truth QA pairs, Hit@3 / MRR metrics
 - Multi-document filtering (query within a specific document)
 - Streaming responses
 - Kubernetes deployment via Helm
