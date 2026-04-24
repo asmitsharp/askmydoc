@@ -40,13 +40,11 @@ func (processor *TaskProcessor) handleDocumentIngestion(ctx context.Context, t *
 
 	fmt.Printf("Worker processing file: %s\n", payload.OriginalFilename)
 
-	// Call the exact same logic that used to be in your HTTP handler
 	_, err := processor.pipeline.Ingest(ctx, payload.FilePath, payload.OriginalFilename)
 	if err != nil {
 		return fmt.Errorf("pipeline.Ingest failed: %w", err)
 	}
 
-	// Clean up the temporary file now that we are done!
 	if err := os.Remove(payload.FilePath); err != nil {
 		fmt.Printf("warning: failed to delete file %s: %v\n", payload.FilePath, err)
 	}
