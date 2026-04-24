@@ -18,6 +18,9 @@ import (
 	"github.com/ashmitsharp/askmydocs/internal/pipeline"
 	"github.com/ashmitsharp/askmydocs/internal/retrieval"
 	"github.com/ashmitsharp/askmydocs/internal/storage"
+	"github.com/ashmitsharp/askmydocs/internal/task"
+	"github.com/ashmitsharp/askmydocs/internal/worker"
+	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
 )
 
@@ -34,6 +37,7 @@ type Config struct {
 	CohereApiKey      string
 	LLMProvider       string
 	GeminiApiKey      string
+	RedisAddr         string
 }
 
 func main() {
@@ -106,8 +110,30 @@ func main() {
 	chunker := ingestion.NewTextChunker()
 	ingestionPipeLine := pipeline.NewPipeLine(loader, chunker, embedder, store, bm25store)
 	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, bm25store, llmClient, reranker)
-	handler := api.NewHandler(ingestionPipeLine, queryPipeLine)
 
+	redisOpt := asynq.RedisClientOpt{Addr: cfg.RedisAddr}
+	asynqClient := asynq.NewClient(redisOpt)
+	defer asynqClient.Close()
+
+	handler := api.NewHandler(ingestionPipeLine, queryPipeLine, asynqClient)
+
+	asynqServer := asynq.NewServer(
+		redisOpt,
+		asynq.Config{
+			Concurrency: 10,
+		},
+	)
+
+	taskProcessor := worker.NewTaskProcessor(ingestionPipeLine)
+	asynqMux := asynq.NewServeMux()
+	asynqMux.HandleFunc(task.TypeDocumentIngestion, taskProcessor.ProcessTask)
+
+	go func() {
+		log.Printf("Asynq Worker Server starting on %s", cfg.RedisAddr)
+		if err := asynqServer.Run(asynqMux); err != nil {
+			log.Fatalf("could not run asynq server: %v", err)
+		}
+	}()
 	server := &http.Server{
 		Addr:         ":" + cfg.Port,
 		Handler:      handler.Routes(),
@@ -162,6 +188,7 @@ func readConfig() Config {
 		CohereApiKey:      os.Getenv("COHERE_API_KEY"),
 		LLMProvider:       defaultString(os.Getenv("LLM_PROVIDER"), "openai"),
 		GeminiApiKey:      os.Getenv("GEMINI_API_KEY"),
+		RedisAddr:         defaultString(os.Getenv("REDIS_ADDR"), "localhost:6379"),
 	}
 }
 

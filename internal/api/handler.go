@@ -12,17 +12,21 @@ import (
 
 	"github.com/ashmitsharp/askmydocs/internal/pipeline"
 	"github.com/ashmitsharp/askmydocs/internal/storage"
+	"github.com/ashmitsharp/askmydocs/internal/task"
+	"github.com/hibiken/asynq"
 )
 
 type Handler struct {
-	ingest *pipeline.PipeLine
-	query  *pipeline.QueryPipeLine
+	ingest      *pipeline.PipeLine
+	query       *pipeline.QueryPipeLine
+	asynqClient *asynq.Client
 }
 
-func NewHandler(ingest *pipeline.PipeLine, query *pipeline.QueryPipeLine) *Handler {
+func NewHandler(ingest *pipeline.PipeLine, query *pipeline.QueryPipeLine, asynqClient *asynq.Client) *Handler {
 	return &Handler{
-		ingest: ingest,
-		query:  query,
+		ingest:      ingest,
+		query:       query,
+		asynqClient: asynqClient,
 	}
 }
 
@@ -121,7 +125,7 @@ func (h *Handler) HandleIngest(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "failed to create temp file")
 		return
 	}
-	defer os.Remove(tmpFile.Name())
+	// NOTE: We do not defer os.Remove here because the worker needs the file.
 
 	_, err = io.Copy(tmpFile, file)
 	if err != nil {
@@ -130,18 +134,24 @@ func (h *Handler) HandleIngest(w http.ResponseWriter, r *http.Request) {
 	}
 	tmpFile.Close()
 
-	numChunks, err := h.ingest.Ingest(r.Context(), tmpFile.Name(), header.Filename)
+	t, err := task.NewDocumentIngestionTask(tmpFile.Name(), header.Filename)
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, fmt.Sprintf("ingestion failed: %v", err))
+		writeError(w, http.StatusInternalServerError, "failed to create task")
 		return
 	}
 
-	resp := IngestResponse{
-		Status:   "ingested",
-		Filename: header.Filename,
-		Message:  fmt.Sprintf("Successfully ingested %d chunks", numChunks),
+	info, err := h.asynqClient.Enqueue(t)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, fmt.Sprintf("failed to enqueue task: %v", err))
+		return
 	}
-	writeJSON(w, http.StatusOK, resp)
+
+	resp := map[string]string{
+		"status":  "processing",
+		"job_id":  info.ID,
+		"message": "File uploaded and queued for processing",
+	}
+	writeJSON(w, http.StatusAccepted, resp)
 
 }
 func writeJSON(w http.ResponseWriter, status int, data any) {
