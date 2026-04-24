@@ -1,5 +1,7 @@
 # AskMyDocs
 
+[![CI](https://github.com/ashmitsharp/askmydocs/actions/workflows/ci.yml/badge.svg)](https://github.com/ashmitsharp/askmydocs/actions/workflows/ci.yml)
+
 A production-grade RAG (Retrieval-Augmented Generation) system built in Go. Upload documents, ask questions, get answers grounded in your content.
 
 This started as a portfolio project to go deep on how retrieval actually works — not just "embed and search" but the full pipeline: hybrid retrieval, reranking, sliding window context, token budgeting. The kind of stuff that separates a demo from something you'd trust in production.

@@ -1,0 +1,135 @@
+name : CI Pipeline
+on : 
+  pull_request :
+  push : 
+   branches : ["main"]
+   tags: ["v*"]
+  workflow_dispatch:
+
+jobs :
+  lint :
+    runs-on : ubuntu-latest
+    steps :
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Validate dependencies
+        run: go mod verify
+
+      - name: Vet the codebase
+        run: go vet ./...
+
+      - name: Lint with golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          skip-cache: true
+          args: --fix
+  test :
+    name: Run Tests
+    runs-on : ubuntu-latest
+    steps : 
+    - uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: "1.24"
+        cache: true
+
+    - name: Start Postgres + Qdrant
+      run: docker compose -f docker/docker-compose.yml up -d
+
+    - name: Wait for services
+      run: |
+        echo "Waiting for Postgres..."
+        until docker compose -f docker/docker-compose.yml exec -T postgres pg_isready; do
+          sleep 2
+        done
+
+        echo "Waiting for Qdrant..."
+        until curl -s http://localhost:6333/healthz; do
+          sleep 2
+        done
+    - name: Download dependencies
+      run: go mod download
+    - name: Run unit + integration tests
+      env:
+        QDRANT_ADDR: localhost
+        POSTGRES_DSN: postgres://askmydocs:askmydocs@localhost:5432/askmydocs?sslmode=disable
+      run: go test -v ./...
+
+    - name: Show container logs on failure
+      if: failure()
+      run: docker compose -f docker/docker-compose.yml logs
+
+    - name: Stop containers
+      if: always()
+      run: docker compose -f docker/docker-compose.yml down -v
+
+  eval :
+    name : Run Eval Pipeline
+    runs-on : ubuntu-latest
+    needs : test
+    steps : 
+    - uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: "1.24"
+        cache: true
+        
+    - name: Start Postgres + Qdrant
+      run: docker compose -f docker/docker-compose.yml up -d
+
+    - name: Wait for services
+      run: |
+        echo "Waiting for Postgres..."
+        until docker compose -f docker/docker-compose.yml exec -T postgres pg_isready; do
+          sleep 2
+        done
+
+        echo "Waiting for Qdrant..."
+        until curl -s http://localhost:6333/healthz; do
+          sleep 2
+        done
+    - name : Select Dataset
+      id : dataset
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [[ "${{ github.ref }}" == refs/tags/* ]]; then
+          echo "file=testdata/golden_set.json" >> $GITHUB_OUTPUT
+        else
+          echo "file=testdata/small_set.json" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Download dependencies
+      run: go mod download
+    
+    - name: Run evaluation
+      env:
+        QDRANT_ADDR: localhost
+        POSTGRES_DSN: postgres://askmydocs:askmydocs@localhost:5432/askmydocs?sslmode=disable
+        HF_API_KEY: ${{ secrets.HF_API_KEY }}
+        RERANK_ENABLED: true
+        COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+        LLM_PROVIDER: "groq"
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      run: |
+        go run cmd/eval/main.go \
+          -dataset ${{ steps.dataset.outputs.file }}
+    - name: Show container logs on failure
+      if: failure()
+      run: docker compose -f docker/docker-compose.yml logs
+
+    - name: Stop containers
+      if: always()
+      run: docker compose -f docker/docker-compose.yml down -v
+    
