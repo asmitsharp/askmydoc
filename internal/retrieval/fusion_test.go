@@ -24,14 +24,7 @@ func TestReciprocalRankFusion_Disjoint(t *testing.T) {
 		delete(expectedIDs, fr.ChunkId)
 	}
 
-	scores := map[string]float32{
-		"A": 1.0 / (0 + 60 + 1),
-		"B": 1.0 / (1 + 60 + 2),
-		"C": 1.0 / (2 + 60 + 3),
-		"D": 1.0 / (0 + 60 + 4),
-		"E": 1.0 / (1 + 60 + 5),
-		"F": 1.0 / (2 + 60 + 6),
-	}
+
 
 }
 
