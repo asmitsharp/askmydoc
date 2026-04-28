@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -12,6 +14,7 @@ import (
 
 	"github.com/ashmitsharp/askmydocs/internal/embedding"
 	"github.com/ashmitsharp/askmydocs/internal/eval"
+	"github.com/ashmitsharp/askmydocs/internal/ingestion"
 	"github.com/ashmitsharp/askmydocs/internal/llm"
 	"github.com/ashmitsharp/askmydocs/internal/pipeline"
 	"github.com/ashmitsharp/askmydocs/internal/retrieval"
@@ -120,6 +123,42 @@ func main() {
 
 	// --- Build pipelines ---
 	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, bm25store, llmClient, reranker, nil, nil)
+
+	// --- Pre-eval Ingestion ---
+	testdataBytes, err := os.ReadFile(*goldenDataPath)
+	if err == nil {
+		var testCases []eval.GoldenTestCase
+		if err := json.Unmarshal(testdataBytes, &testCases); err == nil {
+			sourcesToIngest := make(map[string]bool)
+			for _, tc := range testCases {
+				if tc.SourceDocument != "" {
+					sourcesToIngest[tc.SourceDocument] = true
+				}
+			}
+			if len(sourcesToIngest) > 0 {
+				log.Println("--- Ingesting golden dataset source documents ---")
+				loader := ingestion.NewRouter()
+				chunker := ingestion.NewTextChunker()
+				ingestPipe := pipeline.NewPipeLine(loader, chunker, embedder, store, bm25store)
+				
+				baseDir := filepath.Dir(*goldenDataPath)
+				for source := range sourcesToIngest {
+					filePath := filepath.Join(baseDir, source)
+					if _, err := os.Stat(filePath); err == nil {
+						log.Printf("Ingesting %s...", filePath)
+						chunksIngested, err := ingestPipe.Ingest(ctx, filePath, source)
+						if err != nil {
+							log.Printf("Failed to ingest %s: %v", source, err)
+						} else {
+							log.Printf("Successfully ingested %d chunks for %s", chunksIngested, source)
+						}
+					} else {
+						log.Printf("Warning: Source document %s not found at %s", source, filePath)
+					}
+				}
+			}
+		}
+	}
 
 	// --- Build evaluation components ---
 	judge := eval.NewJudge(judgeLLM)

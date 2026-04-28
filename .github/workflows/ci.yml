@@ -25,13 +25,22 @@ jobs :
 
       - name: Vet the codebase
         run: go vet ./...
+      
+      - name: Debug lint config
+        run: |
+          echo "=== Go version ==="
+          go version
+          echo "=== Config file ==="
+          cat .golangci.yml || echo "NO CONFIG FILE FOUND"
+          echo "=== Go env ==="
+          go env GOPATH GOMODCACHE
 
       - name: Lint with golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
           skip-cache: true
-          args: --fix
+          args: --no-config --timeout=5m
   test :
     name: Run Tests
     runs-on : ubuntu-latest
