@@ -53,6 +53,7 @@ You upload a document (PDF, Markdown, plain text). It gets chunked, embedded, an
 - **OpenAI** — `text-embedding-3-small` for embeddings, `gpt-4o-mini` for generation
 - **Cohere** — `rerank-english-v3.0` as the cross-encoder reranker
 - **Docker Compose** — Qdrant + Postgres local setup
+- **Observability** — OpenTelemetry + Langfuse (Tracing), Prometheus (Metrics), Grafana (Dashboards)
 
 Optional alternatives (swappable via env vars):
 - HuggingFace (`all-MiniLM-L6-v2`) or Gemini (`text-embedding-004`) for embeddings
@@ -94,6 +95,22 @@ PDFs with embedded text use `ledongthuc/pdf` for extraction. Scanned PDFs fall b
 
 Before building the prompt, we estimate token counts (rune count / 4, rough but good enough) and enforce a 3000-token ceiling across all selected chunks. This prevents context overflow and keeps latency predictable.
 
+**Langfuse over Jaeger for Tracing**
+
+While Jaeger is great for microservices, Langfuse is specifically built for LLM observability. It allows us to view not just latency, but the exact prompts, retrieved contexts, generation outputs, and token counts directly in the trace tree.
+
+**Business-level Metrics (Prometheus)**
+
+Metrics are emitted from pipeline boundaries (e.g., `rag_retrieval_stage_latency_seconds`) rather than relying purely on vendor SDK instrumentation. This aligns observability with our business logic so we know exactly how much time is spent in BM25 vs Vector search vs Reranking.
+
+**Pre-flight Cost Guardrails**
+
+Before sending a prompt to the LLM, we estimate the token cost based on model pricing. If it exceeds a soft budget (e.g., $0.05), we abort the query. This prevents runaway usage from exceptionally large contexts or malicious queries.
+
+**Typed Failure Taxonomy**
+
+Instead of passing opaque string errors up the stack, we classify errors into typed enums (e.g., `FailureLLMTimeout`, `FailureQdrantUnavailable`). This allows for highly reliable failure rate monitoring and Grafana alerting, categorizing errors by root cause rather than string matching.
+
 ---
 
 ## Project structure
@@ -106,11 +123,15 @@ askmydocs/
 │   ├── embedding/              # OpenAI, HuggingFace, Gemini clients
 │   ├── ingestion/              # loaders (text, PDF, markdown), chunker
 │   ├── llm/                    # OpenAI, Gemini generation clients
+│   ├── observability/          # telemetry, metrics, cost calculation, structured errors
 │   ├── pipeline/               # ingestion pipeline, query pipeline
 │   ├── retrieval/              # RRF fusion, Cohere reranker
 │   └── storage/                # Qdrant vector store, Postgres BM25 store
 ├── migrations/                 # SQL schema
-├── docker/docker-compose.yml
+├── docker/
+│   ├── docker-compose.yml
+│   ├── prometheus/             # Prometheus config
+│   └── grafana/                # Grafana dashboards and config
 └── .env                        # not committed
 ```
 
@@ -132,7 +153,12 @@ cd docker
 docker compose up -d
 ```
 
-This starts Qdrant on ports 6333/6334 and Postgres on 5432.
+This starts the entire local stack:
+- **Qdrant**: 6333/6334 (Vector Store)
+- **Postgres**: 5432 (BM25)
+- **Prometheus**: 9090 (Metrics)
+- **Grafana**: 3001 (Dashboards)
+- **Langfuse**: 3000 (Tracing)
 
 **2. Configure environment**
 
@@ -166,6 +192,10 @@ QDRANT_HOST=localhost
 QDRANT_PORT=6334
 QDRANT_COLLECTION=askmydocs
 POSTGRES_DSN=postgres://askmydocs:askmydocs@localhost:5432/askmydocs?sslmode=disable
+
+# Observability (Tracing via Langfuse)
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
 ```
 
 **3. Run the server**
@@ -247,7 +277,7 @@ Multipart form upload. Field name: `file`.
 // request
 { "question": "your question" }
 
-// response
+// response (headers: X-Trace-Id: 00-xxxxx...)
 {
   "answer": "...",
   "citations": [
@@ -266,6 +296,17 @@ Multipart form upload. Field name: `file`.
 
 ```json
 { "status": "ok", "vector_db": true, "llm": true }
+```
+
+### `GET /metrics`
+
+Prometheus metrics endpoint exposing request latencies, failure counts, and token usage.
+
+```text
+# HELP rag_requests_total Total number of RAG requests
+# TYPE rag_requests_total counter
+rag_requests_total{status="success"} 42
+...
 ```
 
 ---
