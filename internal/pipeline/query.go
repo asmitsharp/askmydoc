@@ -434,7 +434,7 @@ func (q *QueryPipeLine) parseCitations(answerText string, selected []Citation) (
 
 		src := match[1]
 		var chunkIdx int
-		fmt.Sscanf(match[2], "%d", &chunkIdx)
+		_, _ = fmt.Sscanf(match[2], "%d", &chunkIdx)
 		chunkIdx-- // prompt uses 1-indexed chunks
 
 		found := false

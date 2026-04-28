@@ -165,7 +165,7 @@ func (h *Handler) HandleIngest(w http.ResponseWriter, r *http.Request) {
 func writeJSON(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(data)
+	_ = json.NewEncoder(w).Encode(data)
 }
 
 func writeError(ctx context.Context, w http.ResponseWriter, status int, msg string, reason observability.FailureReason) {

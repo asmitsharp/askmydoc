@@ -61,7 +61,7 @@ func (b *BM25Store) Upsert(ctx context.Context, chunks []ingestion.Chunk) error 
 	if err != nil {
 		return fmt.Errorf("begin transaction: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	stmt := `INSERT INTO chunks (id, content, source, chunk_index, page_start, page_end, metadata)
         VALUES ($1, $2, $3, $4, $5, $6, $7)

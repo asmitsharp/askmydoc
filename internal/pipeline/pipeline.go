@@ -37,7 +37,7 @@ func (p *PipeLine) Ingest(ctx context.Context, filepath string, originalFilename
 		document.Source = originalFilename
 	}
 
-	chunks := []ingestion.Chunk{}
+	var chunks []ingestion.Chunk
 	if len(document.Pages) > 0 {
 		chunks = p.chunker.ChunkPages(document)
 	} else {

@@ -116,6 +116,7 @@ jobs :
       env:
         QDRANT_ADDR: localhost
         POSTGRES_DSN: postgres://askmydocs:askmydocs@localhost:5432/askmydocs?sslmode=disable
+        EMBEDDING_PROVIDER: "huggingface"
         HF_API_KEY: ${{ secrets.HF_API_KEY }}
         RERANK_ENABLED: true
         COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
