@@ -34,7 +34,7 @@ func NewGroqLLM(apiKey, model string) *GroqLLM {
 	}
 }
 
-func (g *GroqLLM) Complete(ctx context.Context, prompt string) (string, error) {
+func (g *GroqLLM) Generate(ctx context.Context, prompt string) (*GenerateResponse, error) {
 	var lastErr error
 
 	for attempt := range maxRetries {
@@ -47,7 +47,22 @@ func (g *GroqLLM) Complete(ctx context.Context, prompt string) (string, error) {
 		})
 
 		if err == nil {
-			return resp.Choices[0].Message.Content, nil
+			inputTokens := 0
+			outputTokens := 0
+			if resp.Usage.PromptTokens > 0 {
+				inputTokens = resp.Usage.PromptTokens
+			}
+			if resp.Usage.CompletionTokens > 0 {
+				outputTokens = resp.Usage.CompletionTokens
+			}
+			return &GenerateResponse{
+				Text:           resp.Choices[0].Message.Content,
+				Model:          g.model,
+				Provider:       "groq",
+				InputTokens:    inputTokens,
+				OutputTokens:   outputTokens,
+				UsageEstimated: false,
+			}, nil
 		}
 
 		lastErr = err
@@ -55,7 +70,7 @@ func (g *GroqLLM) Complete(ctx context.Context, prompt string) (string, error) {
 
 		// Only retry on 429 — fail fast on anything else (400, 401, 500...)
 		if !strings.Contains(errStr, "429") {
-			return "", fmt.Errorf("groq completion failed: %w", err)
+			return nil, fmt.Errorf("groq completion failed: %w", err)
 		}
 
 		wait := parseGroqRetryAfter(errStr)
@@ -64,12 +79,12 @@ func (g *GroqLLM) Complete(ctx context.Context, prompt string) (string, error) {
 
 		select {
 		case <-ctx.Done():
-			return "", fmt.Errorf("context cancelled during groq retry: %w", ctx.Err())
+			return nil, fmt.Errorf("context cancelled during groq retry: %w", ctx.Err())
 		case <-time.After(wait):
 		}
 	}
 
-	return "", fmt.Errorf("groq: exhausted %d retries: %w", maxRetries, lastErr)
+	return nil, fmt.Errorf("groq: exhausted %d retries: %w", maxRetries, lastErr)
 }
 
 func parseGroqRetryAfter(errMsg string) time.Duration {

@@ -119,7 +119,7 @@ func main() {
 	}
 
 	// --- Build pipelines ---
-	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, bm25store, llmClient, reranker)
+	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, bm25store, llmClient, reranker, nil, nil)
 
 	// --- Build evaluation components ---
 	judge := eval.NewJudge(judgeLLM)

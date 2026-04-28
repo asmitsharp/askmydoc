@@ -11,8 +11,13 @@ import (
 	"github.com/ashmitsharp/askmydocs/internal/embedding"
 	"github.com/ashmitsharp/askmydocs/internal/ingestion"
 	"github.com/ashmitsharp/askmydocs/internal/llm"
+	"github.com/ashmitsharp/askmydocs/internal/observability"
 	"github.com/ashmitsharp/askmydocs/internal/retrieval"
 	"github.com/ashmitsharp/askmydocs/internal/storage"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Answer struct {
@@ -44,6 +49,10 @@ type QueryPipeLine struct {
 	rerankTopN int
 	rerankSem  chan struct{}
 	llmSem     chan struct{}
+	metrics    *observability.Metrics
+	costCalc   *observability.CostCalculator
+	budgetUSD  float64
+	tracer     trace.Tracer
 }
 
 func NewQueryPipeLine(
@@ -52,7 +61,12 @@ func NewQueryPipeLine(
 	bm25Store *storage.BM25Store,
 	llm llm.LLM,
 	reranker retrieval.Reranker,
+	metrics *observability.Metrics,
+	costCalc *observability.CostCalculator,
 ) *QueryPipeLine {
+	if costCalc == nil {
+		costCalc = observability.NewCostCalculator()
+	}
 	return &QueryPipeLine{
 		embedder:   embedder,
 		store:      store,
@@ -65,6 +79,10 @@ func NewQueryPipeLine(
 		rerankTopN: 5,
 		rerankSem:  make(chan struct{}, 1),
 		llmSem:     make(chan struct{}, 2),
+		metrics:    metrics,
+		costCalc:   costCalc,
+		budgetUSD:  0.05,
+		tracer:     otel.Tracer("askmydocs.pipeline"),
 	}
 }
 
@@ -108,6 +126,13 @@ func (q *QueryPipeLine) execute(
 	question string,
 	filter *storage.MetadataFilter,
 ) (*Answer, []Citation, *Timings, error) {
+	ctx, rootSpan := q.tracer.Start(ctx, "rag.query")
+	rootSpan.SetAttributes(
+		attribute.Int("question.length", len(question)),
+		attribute.Int("fusion_top_n", q.fusionTopN),
+		attribute.Int("rerank_top_n", q.rerankTopN),
+	)
+	defer rootSpan.End()
 	totalStart := time.Now()
 
 	// ── Retrieval phase ──────────────────────────────────────────────────────
@@ -116,6 +141,12 @@ func (q *QueryPipeLine) execute(
 
 	selected, err := q.retrieve(ctx, question, filter)
 	if err != nil {
+		reason := observability.ReasonOf(err)
+		rootSpan.RecordError(err)
+		rootSpan.SetStatus(codes.Error, reason.String())
+		if q.metrics != nil {
+			q.metrics.RequestFailuresTotal.WithLabelValues("retrieve", reason.String()).Inc()
+		}
 		return nil, nil, nil, err
 	}
 
@@ -127,6 +158,12 @@ func (q *QueryPipeLine) execute(
 
 	answer, citations, err := q.generate(ctx, question, selected)
 	if err != nil {
+		reason := observability.ReasonOf(err)
+		rootSpan.RecordError(err)
+		rootSpan.SetStatus(codes.Error, reason.String())
+		if q.metrics != nil {
+			q.metrics.RequestFailuresTotal.WithLabelValues("generate", reason.String()).Inc()
+		}
 		return nil, nil, nil, err
 	}
 
@@ -147,9 +184,15 @@ func (q *QueryPipeLine) retrieve(
 	question string,
 	filter *storage.MetadataFilter,
 ) ([]Citation, error) {
-	questionVector, err := q.embedder.Embed(ctx, []string{question})
+	embedStart := time.Now()
+	embedCtx, embedSpan := q.tracer.Start(ctx, "embed_query")
+	questionVector, err := q.embedder.Embed(embedCtx, []string{question})
+	embedSpan.End()
+	if q.metrics != nil {
+		q.metrics.StageLatencySeconds.WithLabelValues("embed_query").Observe(time.Since(embedStart).Seconds())
+	}
 	if err != nil {
-		return nil, fmt.Errorf("question embedding failed: %w", err)
+		return nil, observability.NewFailure(observability.FailureEmbeddingProvider, "question embedding failed", err)
 	}
 
 	// Run vector search and BM25 concurrently.
@@ -163,15 +206,27 @@ func (q *QueryPipeLine) retrieve(
 	bm25Ch := make(chan searchResult, 1)
 
 	go func() {
+		start := time.Now()
+		stageCtx, span := q.tracer.Start(ctx, "vector_search")
 		log.Println("[DEBUG] Qdrant vector search starting...")
-		results, err := q.store.Search(ctx, questionVector[0], q.fusionTopN, filter)
+		results, err := q.store.Search(stageCtx, questionVector[0], q.fusionTopN, filter)
+		span.End()
+		if q.metrics != nil {
+			q.metrics.StageLatencySeconds.WithLabelValues("vector_search").Observe(time.Since(start).Seconds())
+		}
 		log.Printf("[DEBUG] Qdrant vector search done (%d results, err=%v)", len(results), err)
 		vectorCh <- searchResult{results, err}
 	}()
 
 	go func() {
+		start := time.Now()
+		stageCtx, span := q.tracer.Start(ctx, "bm25_search")
 		log.Println("[DEBUG] BM25 search starting...")
-		results, err := q.bm25Store.Search(ctx, question, q.fusionTopN, filter)
+		results, err := q.bm25Store.Search(stageCtx, question, q.fusionTopN, filter)
+		span.End()
+		if q.metrics != nil {
+			q.metrics.StageLatencySeconds.WithLabelValues("bm25_search").Observe(time.Since(start).Seconds())
+		}
 		log.Printf("[DEBUG] BM25 search done (%d results, err=%v)", len(results), err)
 		bm25Ch <- searchResult{results, err}
 	}()
@@ -191,17 +246,23 @@ func (q *QueryPipeLine) retrieve(
 	}
 
 	if vectorRes.err != nil {
-		return nil, fmt.Errorf("vector search error: %w", vectorRes.err)
+		return nil, observability.NewFailure(observability.FailureQdrantQuery, "vector search error", vectorRes.err)
 	}
 	if bm25Res.err != nil {
-		return nil, fmt.Errorf("bm25 search error: %w", bm25Res.err)
+		return nil, observability.NewFailure(observability.FailureBM25Query, "bm25 search error", bm25Res.err)
 	}
 
 	// Fuse
+	fusionStart := time.Now()
+	_, fusionSpan := q.tracer.Start(ctx, "rrf_fusion")
 	fused := retrieval.ReciprocalRankFusion(vectorRes.results, bm25Res.results, q.fusionTopN)
+	fusionSpan.End()
+	if q.metrics != nil {
+		q.metrics.StageLatencySeconds.WithLabelValues("rrf_fusion").Observe(time.Since(fusionStart).Seconds())
+	}
 	log.Printf("[DEBUG] Fusion done (%d results)", len(fused))
 	if len(fused) == 0 {
-		return nil, fmt.Errorf("no relevant results found after fusion")
+		return nil, observability.NewFailure(observability.FailureNoRelevantResults, "no relevant results found after fusion", nil)
 	}
 
 	// Rerank
@@ -246,6 +307,14 @@ func (q *QueryPipeLine) rerank(
 	question string,
 	fused []retrieval.FusedResult,
 ) ([]retrieval.FusedResult, error) {
+	stageStart := time.Now()
+	_, span := q.tracer.Start(ctx, "rerank")
+	defer func() {
+		span.End()
+		if q.metrics != nil {
+			q.metrics.StageLatencySeconds.WithLabelValues("rerank").Observe(time.Since(stageStart).Seconds())
+		}
+	}()
 	if q.reranker == nil {
 		log.Println("[DEBUG] Reranker disabled, using top fused results")
 		if len(fused) > q.rerankTopN {
@@ -267,12 +336,12 @@ func (q *QueryPipeLine) rerank(
 
 	// Protect the rerank API call
 	if err := acquireSem(ctx, q.rerankSem); err != nil {
-		return nil, fmt.Errorf("rerank semaphore: %w", err)
+		return nil, observability.NewFailure(observability.FailureRerankerTimeout, "rerank semaphore", err)
 	}
 	rerankResults, err := q.reranker.Rerank(ctx, question, documents, q.rerankTopN)
 	releaseSem(q.rerankSem)
 	if err != nil {
-		return nil, fmt.Errorf("reranking failed: %w", err)
+		return nil, observability.NewFailure(observability.FailureRerankerProvider, "reranking failed", err)
 	}
 
 	log.Printf("[DEBUG] Reranking done (%d results)", len(rerankResults))
@@ -281,6 +350,9 @@ func (q *QueryPipeLine) rerank(
 	for i, rr := range rerankResults {
 		finalResults[i] = fused[rr.Index]
 		finalResults[i].RRFScore = rr.RelevanceScore
+		if q.metrics != nil {
+			q.metrics.RetrievalScores.WithLabelValues(fmt.Sprintf("%d", i+1)).Set(float64(rr.RelevanceScore))
+		}
 	}
 	return finalResults, nil
 }
@@ -291,23 +363,57 @@ func (q *QueryPipeLine) generate(
 	question string,
 	selected []Citation,
 ) (*Answer, []Citation, error) {
+	stageStart := time.Now()
+	stageCtx, span := q.tracer.Start(ctx, "llm_generate")
+	defer func() {
+		span.End()
+		if q.metrics != nil {
+			q.metrics.StageLatencySeconds.WithLabelValues("llm_generate").Observe(time.Since(stageStart).Seconds())
+		}
+	}()
 	log.Printf("[DEBUG] Generating answer for %d citations...", len(selected))
 
 	prompt := q.buildPrompt(question, selected)
+	estimatedInputTokens := ingestion.EstimateTokens(prompt)
+	estimatedOutputTokens := 1024
+	estimatedCostUSD := q.costCalc.Estimate("", estimatedInputTokens, estimatedOutputTokens)
+	if estimatedCostUSD > q.budgetUSD {
+		return nil, nil, observability.NewFailure(
+			observability.FailureTokenBudgetExceeded,
+			fmt.Sprintf("estimated request cost %.6f exceeds budget %.2f", estimatedCostUSD, q.budgetUSD),
+			nil,
+		)
+	}
 
 	// Protect the LLM call
-	if err := acquireSem(ctx, q.llmSem); err != nil {
-		return nil, nil, fmt.Errorf("llm semaphore: %w", err)
+	if err := acquireSem(stageCtx, q.llmSem); err != nil {
+		return nil, nil, observability.NewFailure(observability.FailureLLMTimeout, "llm semaphore", err)
 	}
-	answerText, err := q.llm.Complete(ctx, prompt)
+	response, err := q.llm.Generate(stageCtx, prompt)
 	releaseSem(q.llmSem)
 	if err != nil {
-		return nil, nil, fmt.Errorf("LLM generation failed: %w", err)
+		return nil, nil, observability.NewFailure(observability.FailureLLMProvider, "llm generation failed", err)
+	}
+	if response.CostUSD <= 0 {
+		response.CostUSD = q.costCalc.Estimate(response.Model, response.InputTokens, response.OutputTokens)
+	}
+	span.SetAttributes(
+		attribute.String("llm.model", response.Model),
+		attribute.String("llm.provider", response.Provider),
+		attribute.Int("llm.input_tokens", response.InputTokens),
+		attribute.Int("llm.output_tokens", response.OutputTokens),
+		attribute.Float64("llm.cost_usd", response.CostUSD),
+		attribute.Bool("llm.usage_estimated", response.UsageEstimated),
+	)
+	if q.metrics != nil {
+		q.metrics.TokensUsedTotal.WithLabelValues("input", response.Provider, response.Model).Add(float64(response.InputTokens))
+		q.metrics.TokensUsedTotal.WithLabelValues("output", response.Provider, response.Model).Add(float64(response.OutputTokens))
+		q.metrics.CostUSDTotal.WithLabelValues(response.Provider, response.Model, fmt.Sprintf("%t", response.UsageEstimated)).Add(response.CostUSD)
 	}
 
 	log.Println("[DEBUG] LLM generation done")
 
-	validCitations, answerText := q.parseCitations(answerText, selected)
+	validCitations, answerText := q.parseCitations(response.Text, selected)
 
 	return &Answer{Text: answerText}, validCitations, nil
 }

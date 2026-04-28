@@ -2,6 +2,16 @@ package llm
 
 import "context"
 
+type GenerateResponse struct {
+	Text           string
+	Model          string
+	Provider       string
+	InputTokens    int
+	OutputTokens   int
+	CostUSD        float64
+	UsageEstimated bool
+}
+
 type LLM interface {
-	Complete(ctx context.Context, prompt string) (string, error)
+	Generate(ctx context.Context, prompt string) (*GenerateResponse, error)
 }

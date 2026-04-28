@@ -15,6 +15,7 @@ import (
 	"github.com/ashmitsharp/askmydocs/internal/embedding"
 	"github.com/ashmitsharp/askmydocs/internal/ingestion"
 	"github.com/ashmitsharp/askmydocs/internal/llm"
+	"github.com/ashmitsharp/askmydocs/internal/observability"
 	"github.com/ashmitsharp/askmydocs/internal/pipeline"
 	"github.com/ashmitsharp/askmydocs/internal/retrieval"
 	"github.com/ashmitsharp/askmydocs/internal/storage"
@@ -22,6 +23,7 @@ import (
 	"github.com/ashmitsharp/askmydocs/internal/worker"
 	"github.com/hibiken/asynq"
 	"github.com/joho/godotenv"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type Config struct {
@@ -38,6 +40,10 @@ type Config struct {
 	LLMProvider       string
 	GeminiApiKey      string
 	RedisAddr         string
+	LangfuseHost      string
+	LangfusePublicKey string
+	LangfuseSecretKey string
+	AppEnv            string
 }
 
 func main() {
@@ -50,6 +56,24 @@ func main() {
 	log.Printf("Qdrant: %s:%d collection=%s", cfg.QdrantHost, cfg.QdrantPort, cfg.QdrantCollection)
 
 	ctx := context.Background()
+	shutdownTelemetry, err := observability.InitTelemetry(ctx, observability.TelemetryConfig{
+		OTLPEndpoint:      defaultString(cfg.LangfuseHost, "http://localhost:3000/api/public/otel"),
+		OTLPHeaders:       observability.BuildLangfuseOTLPHeaders(cfg.LangfusePublicKey, cfg.LangfuseSecretKey),
+		ServiceName:       "askmydocs",
+		ServiceVersion:    "v0.4.0-observability",
+		Environment:       defaultString(cfg.AppEnv, "local"),
+		InsecureTransport: strings.HasPrefix(defaultString(cfg.LangfuseHost, "http://localhost:3000/api/public/otel"), "http://"),
+	})
+	if err != nil {
+		log.Fatalf("failed to initialize telemetry: %v", err)
+	}
+	defer func() {
+		timeoutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := shutdownTelemetry(timeoutCtx); err != nil {
+			log.Printf("telemetry shutdown error: %v", err)
+		}
+	}()
 
 	embeddingKey := cfg.OpenAIApiKey
 	if strings.EqualFold(cfg.EmbeddingProvider, embedding.ProviderHuggingFace) {
@@ -109,13 +133,15 @@ func main() {
 	loader := ingestion.NewRouter()
 	chunker := ingestion.NewTextChunker()
 	ingestionPipeLine := pipeline.NewPipeLine(loader, chunker, embedder, store, bm25store)
-	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, bm25store, llmClient, reranker)
+	metrics := observability.InitMetrics(nil)
+	costCalc := observability.NewCostCalculator()
+	queryPipeLine := pipeline.NewQueryPipeLine(embedder, store, bm25store, llmClient, reranker, metrics, costCalc)
 
 	redisOpt := asynq.RedisClientOpt{Addr: cfg.RedisAddr}
 	asynqClient := asynq.NewClient(redisOpt)
 	defer asynqClient.Close()
 
-	handler := api.NewHandler(ingestionPipeLine, queryPipeLine, asynqClient)
+	handler := api.NewHandler(ingestionPipeLine, queryPipeLine, asynqClient, metrics)
 
 	asynqServer := asynq.NewServer(
 		redisOpt,
@@ -136,7 +162,7 @@ func main() {
 	}()
 	server := &http.Server{
 		Addr:         ":" + cfg.Port,
-		Handler:      handler.Routes(),
+		Handler:      otelhttp.NewHandler(handler.Routes(), "http.server"),
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 5 * time.Minute,
 		IdleTimeout:  120 * time.Second,
@@ -189,6 +215,10 @@ func readConfig() Config {
 		LLMProvider:       defaultString(os.Getenv("LLM_PROVIDER"), "openai"),
 		GeminiApiKey:      os.Getenv("GEMINI_API_KEY"),
 		RedisAddr:         defaultString(os.Getenv("REDIS_ADDR"), "localhost:6379"),
+		LangfuseHost:      defaultString(os.Getenv("OTEL_EXPORTER_OTLP_ENDPOINT"), "http://localhost:3000/api/public/otel"),
+		LangfusePublicKey: os.Getenv("LANGFUSE_PUBLIC_KEY"),
+		LangfuseSecretKey: os.Getenv("LANGFUSE_SECRET_KEY"),
+		AppEnv:            defaultString(os.Getenv("APP_ENV"), "local"),
 	}
 }
 

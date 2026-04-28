@@ -29,14 +29,14 @@ func NewJudge(llmClient llm.LLM) *Judge {
 func (j *Judge) Evaluate(ctx context.Context, answer string, chunks []string) (float64, error) {
 	prompt := buildJudgePrompt(answer, chunks)
 
-	response, err := j.llm.Complete(ctx, prompt)
+	response, err := j.llm.Generate(ctx, prompt)
 	if err != nil {
 		return 0, fmt.Errorf("judge LLM call failed: %w", err)
 	}
 
-	log.Printf("[DEBUG] Raw Judge Response: %s", response)
+	log.Printf("[DEBUG] Raw Judge Response: %s", response.Text)
 
-	score, err := parseJudgeResponse(response)
+	score, err := parseJudgeResponse(response.Text)
 	if err != nil {
 		return 0, fmt.Errorf("failed to parse judge response: %w", err)
 	}

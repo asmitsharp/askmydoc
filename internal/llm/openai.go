@@ -23,9 +23,9 @@ func NewOpenAIClient(apiKey string) *OpenAIClient {
 	}
 }
 
-func (o *OpenAIClient) Complete(ctx context.Context, prompt string) (string, error) {
+func (o *OpenAIClient) Generate(ctx context.Context, prompt string) (*GenerateResponse, error) {
 	if prompt == "" {
-		return "", fmt.Errorf("prompt cannot be empty")
+		return nil, fmt.Errorf("prompt cannot be empty")
 	}
 
 	resp, err := o.client.Responses.New(ctx, responses.ResponseNewParams{
@@ -34,8 +34,15 @@ func (o *OpenAIClient) Complete(ctx context.Context, prompt string) (string, err
 	})
 
 	if err != nil {
-		return "", fmt.Errorf("error getting response from openai : %w", err)
+		return nil, fmt.Errorf("error getting response from openai : %w", err)
 	}
 
-	return resp.OutputText(), nil
+	return &GenerateResponse{
+		Text:           resp.OutputText(),
+		Model:          string(o.model),
+		Provider:       "openai",
+		InputTokens:    int(resp.Usage.InputTokens),
+		OutputTokens:   int(resp.Usage.OutputTokens),
+		UsageEstimated: false,
+	}, nil
 }

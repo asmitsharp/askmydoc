@@ -3,6 +3,7 @@ package llm
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
@@ -25,27 +26,57 @@ func NewGeminiClient(ctx context.Context, apiKey string) (*GeminiClient, error) 
 	}, nil
 }
 
-func (g *GeminiClient) Complete(ctx context.Context, prompt string) (string, error) {
+func (g *GeminiClient) Generate(ctx context.Context, prompt string) (*GenerateResponse, error) {
 	if prompt == "" {
-		return "", fmt.Errorf("prompt cannot be empty")
+		return nil, fmt.Errorf("prompt cannot be empty")
 	}
 
 	model := g.client.GenerativeModel(g.model)
-	
+
 	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
 	if err != nil {
-		return "", fmt.Errorf("error getting response from gemini : %w", err)
+		return nil, fmt.Errorf("error getting response from gemini : %w", err)
 	}
 
 	if len(resp.Candidates) == 0 || len(resp.Candidates[0].Content.Parts) == 0 {
-		return "", fmt.Errorf("no content returned from gemini")
+		return nil, fmt.Errorf("no content returned from gemini")
 	}
 
 	part := resp.Candidates[0].Content.Parts[0]
-	
-	if textPart, ok := part.(genai.Text); ok {
-		return string(textPart), nil
+	usageEstimated := false
+	inputTokens := 0
+	outputTokens := 0
+	if resp.UsageMetadata != nil {
+		inputTokens = int(resp.UsageMetadata.PromptTokenCount)
+		outputTokens = int(resp.UsageMetadata.CandidatesTokenCount)
+	} else {
+		usageEstimated = true
+		// fallback heuristic when SDK response has no usage metadata.
+		inputTokens = estimateTokens(prompt)
 	}
 
-	return "", fmt.Errorf("unexpected content format returned from gemini")
+	if textPart, ok := part.(genai.Text); ok {
+		text := string(textPart)
+		if usageEstimated {
+			outputTokens = estimateTokens(text)
+		}
+		return &GenerateResponse{
+			Text:           text,
+			Model:          g.model,
+			Provider:       "gemini",
+			InputTokens:    inputTokens,
+			OutputTokens:   outputTokens,
+			UsageEstimated: usageEstimated,
+		}, nil
+	}
+
+	return nil, fmt.Errorf("unexpected content format returned from gemini")
+}
+
+func estimateTokens(text string) int {
+	if strings.TrimSpace(text) == "" {
+		return 0
+	}
+	// Approximation: ~4 characters per token for English-like text.
+	return len(text)/4 + 1
 }
