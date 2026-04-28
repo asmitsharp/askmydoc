@@ -40,7 +40,7 @@ jobs :
         with:
           version: latest
           skip-cache: true
-          args: --no-config --timeout=5m
+          args: --timeout=5m --go=1.24
   test :
     name: Run Tests
     runs-on : ubuntu-latest
@@ -120,6 +120,9 @@ jobs :
           echo "file=testdata/small_set.json" >> $GITHUB_OUTPUT
         fi
     
+    - name: Install Tesseract OCR
+      run: sudo apt-get update && sudo apt-get install -y tesseract-ocr libtesseract-dev
+
     - name: Download dependencies
       run: go mod download
     
