@@ -1,0 +1,19 @@
+# Git
+.git
+.gitignore
+
+# Docs
+*.md
+docs/
+
+# IDE
+.vscode/
+.cursor/
+
+# Secrets (CRITICAL)
+.env
+
+# Tests and other non-build files
+testdata/
+docker/
+.github/

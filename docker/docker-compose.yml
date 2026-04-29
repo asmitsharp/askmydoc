@@ -13,15 +13,40 @@ services:
     image: postgres:16-alpine
     ports:
       - "5432:5432"
+    env_file:
+      - ../.env
     environment:
       POSTGRES_USER: askmydocs
-      POSTGRES_PASSWORD: askmydocs
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: askmydocs
     volumes:
       - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U askmydocs" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../.env
+    environment:
+      - POSTGRES_DSN=postgres://askmydocs:${DB_PASSWORD}@postgres:5432/askmydocs?sslmode=disable
+      - QDRANT_HOST=qdrant
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   redis:
-    image: redis:6.2.14-alpine
+    image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
@@ -36,7 +61,6 @@ services:
     depends_on:
       - qdrant
       - postgres
-      - redis
 
   grafana:
     image: grafana/grafana:latest
@@ -77,6 +101,6 @@ services:
 volumes:
   qdrant_data:
   pg_data:
-  redis_data:
   grafana_data:
   langfuse_db_data:
+  redis_data:
