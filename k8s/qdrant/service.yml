@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdrant-service
+  namespace: askmydocs
+spec:
+  selector: 
+    app: qdrant
+  ports:
+    - name: http
+      port: 6333
+      targetPort: 6333
+    - name: grpc
+      port: 6334
+      targetPort: 6334
+  
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qdrant-headless
+  namespace: askmydocs
+spec:
+  selector:
+    app: qdrant
+  clusterIP: None
+  ports:
+    - port: 6333

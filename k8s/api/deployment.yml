@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: askmydocs-api
+  namespace: askmydocs
+  labels:
+    app: askmydocs-api 
+    version: "v0.7.0"
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: askmydocs-api 
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  
+  template:
+    metadata:
+      labels:
+        app: askmydocs-api 
+    spec: 
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for postgres..."
+              until nc -z postgres-service 5432; do
+                sleep 2
+              done
+              echo "Postgres is ready."
+        - name: wait-for-qdrant
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for qdrant..."
+              until nc -z qdrant-service 6333; do
+                sleep 2
+              done
+              echo "Qdrant is ready."
+      containers:
+        - name: api
+          image: askmydocs/askmydocs-api:v0.7.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          
+          envFrom: 
+            - configMapRef:
+                name: askmydocs-config
+            
+          env:
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: askmydocs-secrets
+                  key: GEMINI_API_KEY
+
+            - name: HF_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: askmydocs-secrets
+                  key: HF_API_KEY
+            
+            - name: COHERE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: askmydocs-secrets
+                  key: COHERE_API_KEY
+
+            - name: POSTGRES_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: askmydocs-secrets
+                  key: POSTGRES_DSN
+            
+            - name: LANGFUSE_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: askmydocs-secrets
+                  key: LANGFUSE_PUBLIC_KEY
+
+            - name: LANGFUSE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: askmydocs-secrets
+                  key: LANGFUSE_SECRET_KEY
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 30 
+            periodSeconds: 2
+          
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            failureThreshold: 3
+
+          volumeMounts:
+            - name: tmp-dir
+              mountPath: /tmp
+      volumes:
+        - name: tmp-dir
+          emptyDir: {}
+
+

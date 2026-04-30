@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: askmydocs-config 
+  namespace: askmydocs
+data:
+  PORT: "8080"
+  EMBEDDING_PROVIDER: "huggingface"
+  LLM_PROVIDER: "gemini"
+
+  QDRANT_HOST: "qdrant-service"
+  QDRANT_PORT: "6334"
+  QDRANT_COLLECTION: "askmydocs"
+
+  REDIS_ADDR: "redis-service:6379"
+  RERANK_ENABLED: "true"
+  APP_ENV: "local"
+  LOG_LEVEL: "info"
+  
+  LANGFUSE_BASE_URL: "https://us.cloud.langfuse.com"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "https://us.cloud.langfuse.com/api/public/otel/v1/traces"
