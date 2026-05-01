@@ -53,6 +53,7 @@ You upload a document (PDF, Markdown, plain text). It gets chunked, embedded, an
 - **OpenAI** — `text-embedding-3-small` for embeddings, `gpt-4o-mini` for generation
 - **Cohere** — `rerank-english-v3.0` as the cross-encoder reranker
 - **Docker Compose** — Qdrant + Postgres local setup
+- **Kubernetes** — full production-style deployment via `kind`
 - **Observability** — OpenTelemetry + Langfuse (Tracing), Prometheus (Metrics), Grafana (Dashboards)
 
 Optional alternatives (swappable via env vars):
@@ -111,6 +112,18 @@ Before sending a prompt to the LLM, we estimate the token cost based on model pr
 
 Instead of passing opaque string errors up the stack, we classify errors into typed enums (e.g., `FailureLLMTimeout`, `FailureQdrantUnavailable`). This allows for highly reliable failure rate monitoring and Grafana alerting, categorizing errors by root cause rather than string matching.
 
+**StatefulSets for databases (Kubernetes)**
+
+Qdrant and PostgreSQL run as StatefulSets rather than Deployments. StatefulSets give stable network identities and ordered pod management, which matters for databases — a Deployment could reschedule a pod to a different node and detach its PVC. PersistentVolumeClaims are declared separately so storage survives pod restarts and redeployments.
+
+**HPA over manual scaling**
+
+The API layer runs behind a HorizontalPodAutoscaler (min: 2, max: 6) targeting 70% CPU utilization. Scale-up is intentionally aggressive (2 pods per 60s) while scale-down is conservative (1 pod per 300s, 5-minute stabilization window) to avoid thrashing under bursty RAG workloads.
+
+**Init containers for dependency ordering**
+
+Rather than using `depends_on` style hacks, the API pod uses init containers that poll `nc -z` against Postgres and Qdrant before the main container starts. This is the correct Kubernetes pattern — liveness/readiness probes protect the pod after startup, but init containers protect it during startup.
+
 ---
 
 ## Project structure
@@ -127,6 +140,14 @@ askmydocs/
 │   ├── pipeline/               # ingestion pipeline, query pipeline
 │   ├── retrieval/              # RRF fusion, Cohere reranker
 │   └── storage/                # Qdrant vector store, Postgres BM25 store
+├── k8s/
+│   ├── api/                    # Deployment, Service, HPA
+│   ├── postgres/               # StatefulSet, Service, PVC
+│   ├── qdrant/                 # StatefulSet, Service, PVC
+│   ├── redis/                  # Deployment, Service
+│   ├── namespace.yml
+│   ├── configmap.yml
+│   └── secrets/
 ├── migrations/                 # SQL schema
 ├── docker/
 │   ├── docker-compose.yml
@@ -226,6 +247,21 @@ curl -X POST http://localhost:8080/query \
 ```bash
 curl http://localhost:8080/health
 ```
+
+---
+
+## Running on Kubernetes
+
+A full Kubernetes deployment is available using `kind` for local clusters. The stack is fully tested end-to-end.
+
+**What's deployed:**
+- **Qdrant & PostgreSQL** — StatefulSets with PVC-backed storage (500Mi each)
+- **Redis** — Deployment with liveness/readiness probes
+- **API** — Deployment with HPA scaling 2–6 replicas at 70% CPU, rolling updates with zero `maxUnavailable`, init containers for startup dependency ordering, and startup/readiness/liveness probes
+
+See [`docs/kubernetes_setup.md`](docs/kubernetes_setup.md) for the complete walkthrough — cluster creation, secret management, image loading into kind, and end-to-end validation via port-forward.
+
+> **Remaining:** ServiceMonitor integration (Prometheus Operator) and Ingress are not yet configured. Currently tested via `kubectl port-forward`.
 
 ---
 
@@ -343,6 +379,6 @@ The evaluation pipeline is built to use a dual-model architecture. For example, 
 
 ## What's next
 
-- Multi-document filtering (query within a specific document)
 - Streaming responses
-- Kubernetes deployment via Helm
+- ServiceMonitor integration for Prometheus Operator
+- Ingress controller configuration
