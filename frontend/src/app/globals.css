@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Superhuman Color System ─────────────────── */
+  --color-parchment-canvas: #f2f0eb;
+  --color-ink:              #292827;
+  --color-bone:             #ffffff;
+  --color-fog:              #e3e3e2;
+  --color-driftwood:        #dcd7d3;
+  --color-graphite:         #666666;
+  --color-aubergine:        #421d24;
+  --color-aubergine-deep:   #4e242c;
+  --color-iris:             #714cb6;
+  --color-indigo-glow:      #353088;
+  --color-lavender-chip:    #d4c7ff;
+
+  /* ── Typography ──────────────────────────────── */
+  /* Super Sans VF → Inter Variable as substitute  */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-mono-var), ui-monospace, SFMono-Regular, monospace;
+
+  /* ── Type Scale ──────────────────────────────── */
+  --text-caption:    12px;
+  --text-body-sm:    14px;
+  --text-body:       16px;
+  --text-subheading: 18px;
+  --text-heading-sm: 22px;
+  --text-heading:    28px;
+  --text-heading-lg: 48px;
+  --text-display:    64px;
+
+  /* ── Spacing (4px base) ──────────────────────── */
+  --spacing-4:  4px;
+  --spacing-8:  8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-28: 28px;
+  --spacing-32: 32px;
+  --spacing-36: 36px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
+
+  /* ── Border Radius ───────────────────────────── */
+  --radius-button: 8px;
+  --radius-link:   12px;
+  --radius-card:   16px;
+  --radius-card-lg: 24px;
+  --radius-pill:   999px;
+
+  /* ── Shadows ─────────────────────────────────── */
+  --shadow-iris-ring: rgb(113, 76, 182) 0px 0px 0px 1px inset;
+  --shadow-card: 0 1px 3px 0 rgba(41,40,39,0.06), 0 1px 2px -1px rgba(41,40,39,0.06);
+  --shadow-elevated: 0 4px 16px 0 rgba(41,40,39,0.10), 0 1px 4px 0 rgba(41,40,39,0.06);
+}
+
+/* ── Keyframes ────────────────────────────────────────── */
+@keyframes fade-slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes bounce-dots {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1);   opacity: 1; }
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--color-parchment-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 460;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-lavender-chip);
+    color: var(--color-ink);
+  }
+
+  /* Thin, warm scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-driftwood);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-graphite); }
+}
+
+/* ── Utility animations exposed as classes ──────────────── */
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.35s ease both;
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease both;
+}

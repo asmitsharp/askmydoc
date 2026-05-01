@@ -15,6 +15,13 @@ I used `kind` to spin up a local Kubernetes cluster named `askmydocs`.
 kind create cluster --name askmydocs
 ```
 
+To enable the Horizontal Pod Autoscaler (HPA) to work, we also need to install the `metrics-server`. Because `kind` uses self-signed certificates, we must patch the deployment with `--kubelet-insecure-tls`.
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl patch deployment metrics-server -n kube-system --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--kubelet-insecure-tls"}]'
+```
+
 ## Step 2: Set Up Secrets and Configurations
 
 Because AskMyDocs relies on several API keys and external connections, I created a Kubernetes Secret to keep them secure.
